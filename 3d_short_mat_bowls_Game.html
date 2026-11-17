@@ -1,0 +1,3879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>UK Open 3D Short Mat Bowls</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #141a24;
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    /* Full-viewport 3D canvas always anchored at base layer */
+    #gameCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      z-index: 1;
+      background: #141a24;
+      touch-action: none;
+    }
+
+    /* Cozy Indoor Clubhouse Pre-Game Menu Styles */
+    .clubhouse-backdrop {
+      background-color: #050608;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.11' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- Lawn Bowl Print 1 --%3E%3Cg transform='translate(42,44) rotate(-18)'%3E%3Cellipse cx='0' cy='0' rx='18' ry='15'/%3E%3Cellipse cx='0' cy='0' rx='11.5' ry='9.5' stroke-dasharray='3 2.5'/%3E%3Ccircle cx='0' cy='0' r='4.2' fill='%23ffffff' fill-opacity='0.08'/%3E%3C/g%3E%3C!-- Jack Print 1 --%3E%3Cg transform='translate(148,34) rotate(12)'%3E%3Ccircle cx='0' cy='0' r='9' stroke='%23facc15' stroke-opacity='0.22'/%3E%3Ccircle cx='-2.5' cy='-2.5' r='2.2' fill='%23facc15' fill-opacity='0.14' stroke='none'/%3E%3C/g%3E%3C!-- Stick Print 1 (Measuring / Delivery Stick) --%3E%3Cg transform='translate(216,56) rotate(36)'%3E%3Crect x='-3' y='-24' width='6' height='48' rx='3'/%3E%3Cline x1='-3' y1='-12' x2='3' y2='-12'/%3E%3Cline x1='-3' y1='12' x2='3' y2='12'/%3E%3Ccircle cx='0' cy='-24' r='4'/%3E%3C/g%3E%3C!-- Bowling Glove Print 1 --%3E%3Cg transform='translate(92,118) rotate(-22)'%3E%3Cpath d='M-10,12 L-10,-4 C-10,-6 -7,-6 -7,-4 L-7,2 L-7,-12 C-7,-14 -4,-14 -4,-12 L-4,0 L-4,-14 C-4,-16 -1,-16 -1,-14 L-1,0 L-1,-12 C-1,-14 2,-14 2,-12 L2,2 L5,-4 C6.5,-6 9,-4.5 7.5,-2 L4,10 L4,17 L-9,17 Z'/%3E%3Cline x1='-8' y1='13' x2='3' y2='13'/%3E%3C/g%3E%3C!-- Lawn Bowl Print 2 --%3E%3Cg transform='translate(202,158) rotate(24)'%3E%3Cellipse cx='0' cy='0' rx='17' ry='14'/%3E%3Cellipse cx='0' cy='0' rx='10.5' ry='8.5' stroke-dasharray='3 2.5'/%3E%3Ccircle cx='0' cy='0' r='3.8' fill='%23ffffff' fill-opacity='0.08'/%3E%3C/g%3E%3C!-- Stick Print 2 --%3E%3Cg transform='translate(34,176) rotate(-48)'%3E%3Crect x='-2.8' y='-22' width='5.6' height='44' rx='2.8'/%3E%3Cline x1='-2.8' y1='-10' x2='2.8' y2='-10'/%3E%3Cline x1='-2.8' y1='10' x2='2.8' y2='10'/%3E%3Ccircle cx='0' cy='-22' r='3.6'/%3E%3C/g%3E%3C!-- Jack Print 2 --%3E%3Cg transform='translate(118,208) rotate(-14)'%3E%3Ccircle cx='0' cy='0' r='8.5' stroke='%23facc15' stroke-opacity='0.22'/%3E%3Ccircle cx='-2' cy='-2' r='2' fill='%23facc15' fill-opacity='0.14' stroke='none'/%3E%3C/g%3E%3C!-- Bowling Glove Print 2 --%3E%3Cg transform='translate(216,226) rotate(16)'%3E%3Cpath d='M-9,11 L-9,-3 C-9,-5 -6,-5 -6,-3 L-6,2 L-6,-11 C-6,-13 -3,-13 -3,-11 L-3,0 L-3,-13 C-3,-15 0,-15 0,-13 L0,0 L0,-11 C0,-13 3,-13 3,-11 L3,2 L6,-3 C7.5,-5 9.5,-3.5 8,-1 L4,9 L4,16 L-8,16 Z'/%3E%3Cline x1='-7' y1='12' x2='3' y2='12'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 260px 260px;
+    }
+
+    .wood-frame {
+      background: linear-gradient(145deg, #7b4723 0%, #5c3419 48%, #3f220f 100%);
+      box-shadow:
+        0 24px 55px rgba(0, 0, 0, 0.58),
+        inset 0 1px 0 rgba(255, 224, 178, 0.32),
+        inset 0 -2px 4px rgba(20, 9, 3, 0.65);
+    }
+
+    .cream-card {
+      background-color: #dc2626;
+      border-color: rgba(185, 28, 28, 0.9);
+      color: #ffffff;
+    }
+
+    .cream-subcard {
+      background-color: #fefcf8;
+      border-color: #e6d3b8;
+      color: #271409;
+    }
+
+    .baize-banner {
+      background: linear-gradient(135deg, #39ff14 0%, #1eff45 100%);
+      border-color: #86efac;
+      color: #052e16;
+      box-shadow: 0 0 28px rgba(57, 255, 20, 0.45), 0 20px 45px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-2p-card {
+      background: #1d4ed8;
+      border-color: #1e3a8a;
+      color: #ffffff;
+    }
+    .btn-2p-card:hover {
+      background: #2563eb;
+    }
+
+    .oak-footer-bar {
+      background-color: rgba(243, 232, 212, 0.85);
+      border-color: #e6d3b8;
+    }
+
+    .oak-icon-box {
+      background-color: #f4ead9;
+      border-color: #e6d3b8;
+      color: #5c3419;
+    }
+
+    @keyframes moteDrift {
+      0% {
+        transform: translate3d(0, 0, 0) scale(0.9);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.65;
+      }
+      80% {
+        opacity: 0.45;
+      }
+      100% {
+        transform: translate3d(24px, -90px, 0) scale(1.15);
+        opacity: 0;
+      }
+    }
+
+    .ambient-mote {
+      position: absolute;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(254, 243, 199, 0.95) 0%, rgba(251, 191, 36, 0.15) 70%, transparent 100%);
+      pointer-events: none;
+      animation: moteDrift var(--dur, 11s) ease-in-out var(--delay, 0s) infinite;
+      will-change: transform, opacity;
+    }
+
+    @keyframes lampBreathe {
+      0%, 100% {
+        opacity: 0.72;
+        transform: translateX(-50%) scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.06);
+      }
+    }
+
+    .club-lamp-glow {
+      animation: lampBreathe 6.5s ease-in-out infinite;
+    }
+
+    body.ambient-paused .ambient-mote,
+    body.ambient-paused .club-lamp-glow {
+      animation-play-state: paused !important;
+    }
+
+    #menu-overlay {
+      transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), visibility 420ms ease;
+    }
+
+    #menu-overlay.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .menu-card-shell {
+      transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #menu-overlay.is-hidden .menu-card-shell {
+      transform: translateY(10px) scale(0.985);
+    }
+
+    .switch-track {
+      background-color: #a8a29e;
+      border-color: rgba(68, 64, 60, 0.3);
+    }
+
+    .switch-track.is-on {
+      background-color: #09090b;
+      border-color: #000000;
+    }
+
+    .switch-thumb {
+      transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Full-Viewport 3D Perspective Canvas (Preserved across menu & gameplay) -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- HUD Overlay Layer (Hidden while Pre-Game Menu is open; pointer-events-none so canvas taps pass through) -->
+  <div id="hud-root" class="fixed inset-0 z-10 pointer-events-none hidden opacity-0 transition-opacity duration-300">
+
+    <!-- Top-Left Blue Square Home Button (Returns to Menu) -->
+    <button
+      id="top-home-btn"
+      type="button"
+      aria-label="Return to Menu"
+      title="Return to Menu"
+      style="left: 14px; top: 14px;"
+      class="pointer-events-auto fixed z-30 w-12 h-12 rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white flex items-center justify-center shadow-2xl cursor-pointer transition-all border-2 border-blue-400/50"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 10.5 12 3l9 7.5" />
+        <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" />
+      </svg>
+    </button>
+
+    <!-- Top Scoreboard Bar (Enlarged Championship Tournament Board) -->
+    <header class="fixed top-3 left-3 right-3 flex justify-center pointer-events-none z-20">
+      <div class="pointer-events-auto bg-slate-900/95 backdrop-blur-md border-2 border-slate-700/90 rounded-3xl px-6 sm:px-10 py-3 sm:py-3.5 shadow-2xl flex flex-col items-center gap-1.5 max-w-lg w-full">
+        <!-- Top Sub-Bar: End Counter, Event Title & Menu Button -->
+        <div class="flex items-center justify-between w-full px-1 text-xs font-black uppercase tracking-widest text-slate-400">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.8)]"></span>
+            <span id="hud-end" class="text-amber-400 font-extrabold tracking-wider">END 1 / 3</span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <span class="text-[11px] font-extrabold text-slate-400 tracking-widest uppercase hidden sm:inline">UK OPEN 3D</span>
+            <button
+              id="hud-menu-btn"
+              type="button"
+              class="px-2.5 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-600/80 text-[10px] font-black tracking-wider text-amber-300 uppercase cursor-pointer transition-all"
+              title="Return to Clubhouse Menu"
+            >
+              MENU
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Scoreboard Section -->
+        <div class="flex items-center justify-around w-full pt-1 border-t border-slate-700/60">
+          <!-- P1 (Red Team) -->
+          <div class="flex items-center gap-2.5 sm:gap-3.5">
+            <div class="w-4 h-4 rounded-full bg-red-600 shadow-[0_0_10px_rgba(239,68,68,0.8)] border border-red-400"></div>
+            <div class="flex flex-col text-left">
+              <span id="hud-p1-label" class="text-xs sm:text-sm font-black text-slate-200 tracking-wider whitespace-nowrap">YOU</span>
+              <span class="text-[9px] font-bold text-red-400 uppercase tracking-widest leading-none">RED</span>
+            </div>
+            <span id="hud-p1-score" class="text-3xl sm:text-4xl font-black text-white tabular-nums px-3 py-1 rounded-2xl bg-slate-800 border border-slate-600/80 shadow-inner">0</span>
+          </div>
+
+          <!-- Divider -->
+          <div class="text-slate-500 font-black text-xl px-2 sm:px-4">-</div>
+
+          <!-- P2 / Gary McNabb (Blue Team) -->
+          <div class="flex items-center gap-2.5 sm:gap-3.5">
+            <span id="hud-p2-score" class="text-3xl sm:text-4xl font-black text-white tabular-nums px-3 py-1 rounded-2xl bg-slate-800 border border-slate-600/80 shadow-inner">0</span>
+            <div class="flex flex-col text-right">
+              <span id="hud-p2-label" class="text-xs sm:text-sm font-black text-slate-200 tracking-wider whitespace-nowrap">GARY MCNABB</span>
+              <span class="text-[9px] font-bold text-blue-400 uppercase tracking-widest leading-none">BLUE</span>
+            </div>
+            <div class="w-4 h-4 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(59,130,246,0.8)] border border-blue-400"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Large Yellow & Blue Head View Toggle Button (Positioned Below Enlarged Scoreboard) -->
+    <button
+      id="head-view-btn"
+      type="button"
+      aria-label="Toggle Head View"
+      style="top: 152px; width: 72px; height: 72px;"
+      class="pointer-events-auto fixed left-1/2 -translate-x-1/2 rounded-full bg-yellow-400 hover:bg-yellow-300 active:scale-95 border-4 border-slate-900 shadow-2xl flex items-center justify-center transition-all duration-150 cursor-pointer z-10"
+    >
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>
+        <circle cx="12" cy="12" r="3" fill="#1d4ed8"/>
+      </svg>
+    </button>
+
+    <!-- Lying Shot Badge (Top Right) -->
+    <div
+      id="lying-shot-badge"
+      style="top: 16px; right: 16px;"
+      class="pointer-events-auto fixed bg-slate-900/92 backdrop-blur-md border border-slate-700/80 rounded-2xl px-3.5 py-2 shadow-2xl flex items-center gap-2.5 z-10 transition-all"
+    >
+      <span id="lying-shot-dot" class="inline-block w-3.5 h-3.5 rounded-full bg-slate-600 border border-slate-500"></span>
+      <div class="flex flex-col text-left leading-none">
+        <span id="lying-shot-label" class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-0.5">SHOT</span>
+        <span id="lying-shot-text" class="text-xs sm:text-sm font-black text-slate-400 whitespace-nowrap">NONE</span>
+      </div>
+    </div>
+
+    <!-- Event Toast Banner -->
+    <div
+      id="toast-banner"
+      style="top: 236px;"
+      class="fixed left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-300 opacity-0 -translate-y-2 z-10"
+    >
+      <div id="toast-text" class="bg-slate-900/95 border border-slate-600 text-amber-300 font-bold text-xs sm:text-sm px-4 py-1.5 rounded-full shadow-xl tracking-wide uppercase whitespace-nowrap">
+        Tap inside the white delivery box to place your bowl
+      </div>
+    </div>
+
+    <!-- Bottom-Left Lock Placement Toggle Button -->
+    <div id="lock-placement-dock" style="bottom: 20px; left: 24px;" class="pointer-events-auto fixed z-20 flex flex-col items-center gap-1.5">
+      <div class="relative">
+        <button
+          id="lock-placement-btn"
+          type="button"
+          aria-label="Lock Placement"
+          aria-pressed="false"
+          style="width: 92px; height: 100px;"
+          class="bg-transparent border-0 p-0 flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer drop-shadow-[0_6px_12px_rgba(0,0,0,0.6)]"
+        >
+          <!-- Unlocked Cartoon Padlock (default) -->
+          <svg id="lock-icon-unlocked" width="84" height="96" viewBox="0 0 100 116" fill="none">
+            <!-- Open grey shackle (raised on the right) -->
+            <path
+              d="M27 54V33C27 18.5 37.5 8 50 8C61 8 70.5 16 72.5 28"
+              stroke="#1f2937"
+              stroke-width="14"
+              stroke-linecap="round"
+            />
+            <path
+              d="M27 54V33C27 18.5 37.5 8 50 8C61 8 70.5 16 72.5 28"
+              stroke="#8f959b"
+              stroke-width="9.5"
+              stroke-linecap="round"
+            />
+            <!-- Golden padlock body -->
+            <rect x="16" y="48" width="68" height="58" rx="11" fill="#f6c34d" stroke="#1f2937" stroke-width="3" />
+            <!-- Top & left highlight -->
+            <path d="M21 57C21 53.5 23.5 51 27 51H73C75.5 51 77.5 52.2 78.5 54H27C24.5 54 23 55.8 23 58.5V99C21.8 97.8 21 96 21 93.8V57Z" fill="#fde68a" opacity="0.7" />
+            <!-- Bottom & right warm shading -->
+            <path d="M77 52C79.8 53.5 82 56.5 82 60V93C82 99 77 104 71 104H44C57 101 73 98 76 88V52Z" fill="#d49e35" opacity="0.65" />
+            <!-- Keyhole -->
+            <path
+              d="M50 61C45.3 61 41.5 64.8 41.5 69.5C41.5 72.4 43 75 45.2 76.5L43 90.5C42.8 91.8 43.8 93 45.1 93H54.9C56.2 93 57.2 91.8 57 90.5L54.8 76.5C57 75 58.5 72.4 58.5 69.5C58.5 64.8 54.7 61 50 61Z"
+              fill="#2d343b"
+              stroke="#1f2937"
+              stroke-width="2"
+            />
+          </svg>
+
+          <!-- Locked Cartoon Padlock (same style & size, shown when locked) -->
+          <svg id="lock-icon-locked" width="84" height="96" viewBox="0 0 100 116" fill="none" class="hidden">
+            <!-- Closed grey shackle -->
+            <path
+              d="M27 54V33C27 18.5 37.5 8 50 8C62.5 8 73 18.5 73 33V54"
+              stroke="#1f2937"
+              stroke-width="14"
+              stroke-linecap="round"
+            />
+            <path
+              d="M27 54V33C27 18.5 37.5 8 50 8C62.5 8 73 18.5 73 33V54"
+              stroke="#8f959b"
+              stroke-width="9.5"
+              stroke-linecap="round"
+            />
+            <!-- Golden padlock body -->
+            <rect x="16" y="48" width="68" height="58" rx="11" fill="#f6c34d" stroke="#1f2937" stroke-width="3" />
+            <!-- Top & left highlight -->
+            <path d="M21 57C21 53.5 23.5 51 27 51H73C75.5 51 77.5 52.2 78.5 54H27C24.5 54 23 55.8 23 58.5V99C21.8 97.8 21 96 21 93.8V57Z" fill="#fde68a" opacity="0.7" />
+            <!-- Bottom & right warm shading -->
+            <path d="M77 52C79.8 53.5 82 56.5 82 60V93C82 99 77 104 71 104H44C57 101 73 98 76 88V52Z" fill="#d49e35" opacity="0.65" />
+            <!-- Keyhole -->
+            <path
+              d="M50 61C45.3 61 41.5 64.8 41.5 69.5C41.5 72.4 43 75 45.2 76.5L43 90.5C42.8 91.8 43.8 93 45.1 93H54.9C56.2 93 57.2 91.8 57 90.5L54.8 76.5C57 75 58.5 72.4 58.5 69.5C58.5 64.8 54.7 61 50 61Z"
+              fill="#2d343b"
+              stroke="#1f2937"
+              stroke-width="2"
+            />
+          </svg>
+        </button>
+        <span
+          id="bowls-badge"
+          class="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-red-600 border-2 border-slate-900 text-white text-base font-black flex items-center justify-center shadow-lg"
+        >
+          4
+        </span>
+      </div>
+      <span
+        id="lock-placement-label"
+        class="text-white font-black text-xs sm:text-sm tracking-wider uppercase drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] select-none cursor-pointer transition-transform active:scale-95"
+      >
+        LOCK PLACEMENT
+      </span>
+    </div>
+
+    <!-- Bottom-Right Forehand / Backhand Bias Selector Dock -->
+    <div id="hand-bias-dock" style="bottom: 34px; right: 20px;" class="pointer-events-auto fixed z-20">
+      <div class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-3xl p-2 shadow-2xl flex items-center gap-2">
+        <button
+          id="btn-fh"
+          type="button"
+          aria-label="Forehand (Curves Left)"
+          class="px-5 py-3.5 rounded-2xl text-sm sm:text-base font-black tracking-wide transition-all bg-red-600 text-white shadow cursor-pointer select-none"
+        >
+          FOREHAND
+        </button>
+        <button
+          id="btn-bh"
+          type="button"
+          aria-label="Backhand (Curves Right)"
+          class="px-5 py-3.5 rounded-2xl text-sm sm:text-base font-black tracking-wide transition-all text-slate-300 hover:text-white cursor-pointer select-none"
+        >
+          BACKHAND
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Between-Ends Summary Modal -->
+  <div id="end-summary-modal" class="fixed inset-0 z-30 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl text-center flex flex-col gap-4">
+      <div class="text-xs font-extrabold uppercase tracking-widest text-amber-400" id="summary-end-label">END 1 COMPLETE</div>
+      <h2 class="text-2xl sm:text-3xl font-black text-white" id="summary-headline">YOU SCORED 2 SHOTS</h2>
+      <p class="text-sm text-slate-300" id="summary-subtext">Closest red bowl was 0.24m from the jack.</p>
+
+      <div class="grid grid-cols-2 gap-3 bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+        <div class="flex flex-col items-center">
+          <span id="summary-p1-label" class="text-xs font-bold text-red-400">YOU</span>
+          <span class="text-3xl font-black text-white" id="summary-p1-total">2</span>
+        </div>
+        <div class="flex flex-col items-center border-l border-slate-700">
+          <span id="summary-p2-label" class="text-xs font-bold text-blue-400">GARY MCNABB</span>
+          <span class="text-3xl font-black text-white" id="summary-p2-total">0</span>
+        </div>
+      </div>
+
+      <button
+        id="summary-continue-btn"
+        type="button"
+        class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-black text-base tracking-wide uppercase shadow-lg cursor-pointer transition-all"
+      >
+        CONTINUE
+      </button>
+
+      <button
+        id="summary-menu-btn"
+        type="button"
+        class="w-full py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 active:scale-98 border border-slate-600/80 text-amber-300 font-bold text-sm tracking-wide uppercase cursor-pointer transition-all"
+      >
+        MAIN MENU
+      </button>
+    </div>
+  </div>
+
+  <!-- Winner Jack Length Selection Modal (End 2+) -->
+  <div id="jack-select-modal" class="fixed inset-0 z-40 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl text-center flex flex-col gap-4">
+      <div class="text-xs font-extrabold uppercase tracking-widest text-yellow-400" id="jack-modal-subtitle">YOU HOLD THE MAT • END 2</div>
+      <h2 class="text-2xl font-black text-white">CHOOSE JACK LENGTH</h2>
+      <p class="text-xs sm:text-sm text-slate-300">Select the jack position before the first bowl of the end is played.</p>
+
+      <div class="flex flex-col gap-3 mt-1">
+        <button
+          type="button"
+          data-jack="SHORT"
+          class="jack-choice-btn w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-black text-lg tracking-wider uppercase shadow-lg cursor-pointer transition-all"
+        >
+          SHORT
+        </button>
+        <button
+          type="button"
+          data-jack="MEDIUM"
+          class="jack-choice-btn w-full py-4 rounded-2xl bg-amber-500 hover:bg-amber-400 active:scale-98 text-slate-950 font-black text-lg tracking-wider uppercase shadow-lg cursor-pointer transition-all"
+        >
+          MEDIUM
+        </button>
+        <button
+          type="button"
+          data-jack="LONG"
+          class="jack-choice-btn w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-98 text-white font-black text-lg tracking-wider uppercase shadow-lg cursor-pointer transition-all"
+        >
+          LONG
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       COZY CLUBHOUSE PRE-GAME MENU OVERLAY (Shown before game opens)
+       ========================================================================= -->
+  <div
+    id="menu-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="menu-title"
+    class="fixed inset-0 z-50 clubhouse-backdrop flex flex-col items-center p-4 sm:p-6 overflow-y-auto gap-4"
+  >
+    <!-- Ambient Warm Clubhouse Lighting & Drifting Dust Motes (Paused in-game) -->
+    <div id="ambient-layer" aria-hidden="true" class="fixed inset-0 overflow-hidden pointer-events-none">
+      <div
+        class="club-lamp-glow absolute -top-24 left-1/2 w-[540px] h-[280px] rounded-full blur-3xl"
+        style="background: radial-gradient(circle, rgba(253, 230, 138, 0.24) 0%, rgba(217, 119, 6, 0.06) 55%, transparent 100%);"
+      ></div>
+      <span class="ambient-mote w-2 h-2" style="left: 14%; top: 72%; --dur: 12s; --delay: 0s;"></span>
+      <span class="ambient-mote w-1.5 h-1.5" style="left: 26%; top: 58%; --dur: 9.5s; --delay: 2.1s;"></span>
+      <span class="ambient-mote w-2.5 h-2.5" style="left: 44%; top: 82%; --dur: 13s; --delay: 1.2s;"></span>
+      <span class="ambient-mote w-1.5 h-1.5" style="left: 61%; top: 64%; --dur: 10.5s; --delay: 3.4s;"></span>
+      <span class="ambient-mote w-2 h-2" style="left: 78%; top: 76%; --dur: 11.5s; --delay: 0.7s;"></span>
+      <span class="ambient-mote w-1.5 h-1.5" style="left: 86%; top: 48%; --dur: 14s; --delay: 4.0s;"></span>
+    </div>
+
+    <!-- 1. Bright Neon Green Title Box Centered Between Top of Page and White Box -->
+    <header id="menu-top-banner" class="menu-card-shell relative w-full max-w-2xl shrink-0 my-auto min-h-[140px] sm:min-h-[170px] rounded-2xl baize-banner px-6 py-8 sm:px-8 sm:py-11 border-2 overflow-hidden flex items-center">
+      <div aria-hidden="true" class="absolute inset-y-0 right-8 w-px bg-emerald-950/15"></div>
+
+      <div class="relative w-full flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+        <!-- Minimalist Vector Bowl & Jack Emblem -->
+        <div class="shrink-0 w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
+          <svg width="76" height="76" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <ellipse cx="30" cy="52" rx="22" ry="4.5" fill="#04150d" opacity="0.55" />
+            <circle cx="26" cy="34" r="17" fill="url(#emblemBowlGrad)" stroke="#7c2d12" stroke-width="2" />
+            <circle cx="26" cy="34" r="11" stroke="#fed7aa" stroke-width="1.4" stroke-dasharray="3 2.5" opacity="0.7" />
+            <circle cx="26" cy="34" r="5" fill="#f59e0b" stroke="#92400e" stroke-width="1.2" />
+            <ellipse cx="20" cy="25" rx="4.5" ry="2.2" transform="rotate(-28 20 25)" fill="#ffffff" opacity="0.35" />
+            <circle cx="47" cy="40" r="8.5" fill="url(#emblemJackGrad)" stroke="#b45309" stroke-width="1.6" />
+            <circle cx="44.5" cy="37" r="2.2" fill="#fef9c3" opacity="0.8" />
+            <defs>
+              <radialGradient id="emblemBowlGrad" cx="35%" cy="28%" r="70%">
+                <stop offset="0%" stop-color="#f87171" />
+                <stop offset="45%" stop-color="#b91c1c" />
+                <stop offset="100%" stop-color="#450a0a" />
+              </radialGradient>
+              <radialGradient id="emblemJackGrad" cx="35%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#fef08a" />
+                <stop offset="55%" stop-color="#facc15" />
+                <stop offset="100%" stop-color="#ca8a04" />
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <p class="text-xs sm:text-sm font-extrabold uppercase tracking-[0.2em] text-red-700 mb-1.5">
+            Chief Jobber's Bowling Club
+          </p>
+          <h1 id="menu-title" class="text-3xl sm:text-4xl font-black tracking-tight text-emerald-950 leading-tight">
+            Short Mat Bowls Game
+          </h1>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Cream Clubhouse Card -->
+    <main id="menu-main-card" class="menu-card-shell relative w-full max-w-2xl mb-auto">
+      <div class="cream-card rounded-[24px] shadow-2xl px-5 py-6 sm:px-8 sm:py-7 flex flex-col gap-6" style="border: none;">
+
+        <!-- 2. Primary Game Mode Selection -->
+        <section aria-label="Game Modes" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <!-- 2 Player Mode Card / Action -->
+          <button
+            id="btn-2p-mode"
+            type="button"
+            class="group text-left rounded-2xl btn-2p-card active:scale-[0.985] p-5 border-2 shadow-lg hover:shadow-xl transition-all duration-200 flex flex-col justify-between gap-4 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-400/70"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="w-12 h-12 rounded-xl border border-blue-300/35 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-200 bg-blue-950/60">
+                <!-- Clean Inline SVG Crossed-Swords Duel Icon -->
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fde68a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5" />
+                  <line x1="13" y1="19" x2="19" y2="13" />
+                  <line x1="16" y1="16" x2="20" y2="20" />
+                  <line x1="19" y1="21" x2="21" y2="19" />
+                  <polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5" />
+                  <line x1="5" y1="14" x2="9" y2="18" />
+                  <line x1="7" y1="17" x2="4" y2="20" />
+                  <line x1="3" y1="19" x2="5" y2="21" />
+                </svg>
+              </div>
+              <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full text-blue-100 bg-blue-950/50 border border-blue-300/30">
+                Pass &amp; Play
+              </span>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-extrabold tracking-tight text-white">
+                2 Player Mode
+              </h2>
+              <p class="text-xs sm:text-sm text-blue-100/90 mt-1 leading-relaxed">
+                Friendly local head-to-head match on the same rink with alternating mat turns.
+              </p>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-white/20 text-xs sm:text-sm font-extrabold text-amber-200">
+              <span>Start Local Match</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </div>
+          </button>
+
+          <!-- vs AI Card / Action (Opens 6-slot AI Selector Page) -->
+          <button
+            id="btn-vs-ai"
+            type="button"
+            class="group text-left rounded-2xl btn-2p-card active:scale-[0.985] p-5 border-2 shadow-lg hover:shadow-xl transition-all duration-200 flex flex-col justify-between gap-4 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-400/70"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="w-12 h-12 rounded-xl border border-blue-300/35 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-200 bg-blue-950/60">
+                <!-- Single Sword Icon -->
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fde68a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5" />
+                  <line x1="13" y1="19" x2="19" y2="13" />
+                  <line x1="16" y1="16" x2="20" y2="20" />
+                  <line x1="19" y1="21" x2="21" y2="19" />
+                </svg>
+              </div>
+              <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full text-blue-100 bg-blue-950/50 border border-blue-300/30">
+                AI
+              </span>
+            </div>
+
+            <div>
+              <h2 class="text-xl font-extrabold tracking-tight text-white">
+                vs AI
+              </h2>
+              <p class="text-xs sm:text-sm text-blue-100/90 mt-1 leading-relaxed">
+                Challenge club AI opponents with unique styles, draw weights, and tactical shots.
+              </p>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-white/20 text-xs sm:text-sm font-extrabold text-amber-200">
+              <span>AI Selector</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </div>
+          </button>
+        </section>
+
+        <!-- 3. Audio Controls Footer Bar (Separate boxes: Music left, Sound right) -->
+        <footer class="flex items-center justify-between gap-4">
+          <!-- Background Music Box (Left Corner) -->
+          <div class="oak-footer-bar rounded-2xl border px-3.5 py-2.5 shadow-sm flex items-center gap-3">
+            <span class="oak-icon-box w-9 h-9 rounded-xl border flex items-center justify-center shadow-sm" title="Background Music">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18V5l12-2v13" />
+                <circle cx="6" cy="18" r="3" />
+                <circle cx="18" cy="16" r="3" />
+              </svg>
+            </span>
+
+            <button
+              id="toggle-music"
+              type="button"
+              role="switch"
+              aria-checked="true"
+              aria-label="Toggle Background Music"
+              class="switch-track is-on relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border p-0.5 shadow-inner transition-colors duration-200 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/70"
+            >
+              <span class="switch-thumb inline-block h-5 w-5 rounded-full bg-amber-50 shadow-md translate-x-5"></span>
+            </button>
+          </div>
+
+          <!-- Sound Effects (SFX) Box (Right Corner) -->
+          <div class="oak-footer-bar rounded-2xl border px-3.5 py-2.5 shadow-sm flex items-center gap-3">
+            <span class="oak-icon-box w-9 h-9 rounded-xl border flex items-center justify-center shadow-sm" title="Sound Effects">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              </svg>
+            </span>
+
+            <button
+              id="toggle-sfx"
+              type="button"
+              role="switch"
+              aria-checked="true"
+              aria-label="Toggle Sound Effects"
+              class="switch-track is-on relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border p-0.5 shadow-inner transition-colors duration-200 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/70"
+            >
+              <span class="switch-thumb inline-block h-5 w-5 rounded-full bg-amber-50 shadow-md translate-x-5"></span>
+            </button>
+          </div>
+        </footer>
+
+      </div>
+    </main>
+
+    <!-- AI Selector 6-Box Page (Hidden until "vs AI" is clicked) -->
+    <section id="ai-selector-shell" aria-label="AI Opponent Selector" class="menu-card-shell relative w-full max-w-5xl my-auto hidden">
+      <div class="rounded-[24px] shadow-2xl px-5 py-6 sm:px-8 sm:py-7 flex flex-col gap-5 border border-slate-700/80" style="background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);">
+        <!-- Header with Back Button -->
+        <header class="rounded-2xl baize-banner px-5 py-4 shadow-md border flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="shrink-0 w-11 h-11 rounded-xl border border-amber-300/35 flex items-center justify-center shadow-inner" style="background-color: rgba(63, 34, 15, 0.7);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fde68a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5" />
+                <line x1="13" y1="19" x2="19" y2="13" />
+                <line x1="16" y1="16" x2="20" y2="20" />
+                <line x1="19" y1="21" x2="21" y2="19" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300">vs AI</p>
+              <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight text-amber-50 truncate">AI Selector</h2>
+            </div>
+          </div>
+
+          <button
+            id="btn-ai-back"
+            type="button"
+            class="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/35 active:scale-95 border border-amber-300/40 text-amber-100 font-bold text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer transition-all"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            <span>Back</span>
+          </button>
+        </header>
+
+        <!-- 6-Box Grid for AI Opponents -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Slot 1: Gary McNabb -->
+          <div class="cream-subcard rounded-2xl border-2 p-5 shadow-md hover:shadow-lg transition-shadow duration-200 flex flex-col justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="shrink-0 w-16 h-16 rounded-full bg-gradient-to-b from-amber-100 to-amber-200/70 border-2 border-amber-800/60 shadow-md overflow-hidden flex items-center justify-center">
+                <svg width="60" height="60" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                  <circle cx="32" cy="32" r="32" fill="#e7f3ec" />
+                  <path d="M12 64 C14 48, 22 44, 32 44 C42 44, 50 48, 52 64 Z" fill="#175a3a" />
+                  <path d="M25 44 L32 51 L39 44" stroke="#fde68a" stroke-width="2" fill="#0f3d27" />
+                  <rect x="27" y="37" width="10" height="9" rx="4" fill="#f3c6a5" />
+                  <circle cx="32" cy="28" r="12.5" fill="#f6cfb2" stroke="#b48361" stroke-width="1.2" />
+                  <path d="M19 25 C20 15, 44 15, 45 25 Z" fill="#3f220f" />
+                  <path d="M17 25 Q32 21 48 25.5 Q32 27.5 17 25 Z" fill="#5c3419" />
+                  <circle cx="27.2" cy="29" r="1.5" fill="#1e293b" />
+                  <circle cx="36.8" cy="29" r="1.5" fill="#1e293b" />
+                  <circle cx="24" cy="32" r="2.2" fill="#f43f5e" opacity="0.22" />
+                  <circle cx="40" cy="32" r="2.2" fill="#f43f5e" opacity="0.22" />
+                  <path d="M27.5 34 Q32 37.5 36.5 34" stroke="#7c2d12" stroke-width="1.8" stroke-linecap="round" />
+                  <circle cx="50" cy="52" r="7" fill="#2563eb" stroke="#1e3a8a" stroke-width="1.4" />
+                  <circle cx="48.5" cy="50.5" r="2" fill="#93c5fd" opacity="0.7" />
+                </svg>
+              </div>
+
+              <div class="min-w-0">
+                <h3 class="text-xl font-extrabold leading-tight truncate" style="color: #271409;">
+                  Gary McNabb
+                </h3>
+                <p class="text-xs sm:text-sm font-bold text-red-600">
+                  Bowls Pro
+                </p>
+              </div>
+            </div>
+
+            <p class="text-xs sm:text-sm leading-relaxed" style="color: rgba(92, 52, 25, 0.9);">
+              Gary has seen every bowls head configuration, he is a tricky little fellow who has knows of all techniques and strategies in order to beat you
+            </p>
+
+            <button
+              id="btn-ai-gary"
+              type="button"
+              class="w-full py-3 px-4 rounded-xl bg-gradient-to-b from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:scale-[0.985] text-amber-950 font-extrabold text-sm sm:text-base shadow-md hover:shadow-lg border border-amber-700/30 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/70"
+            >
+              <span>Play vs Gary</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="6 4 20 12 6 20 6 4" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Slots 2-6: Empty AI Opponent Slots -->
+          <div class="rounded-2xl border-2 border-dashed border-slate-500/40 bg-slate-800/45 p-5 min-h-[230px] flex flex-col items-center justify-center text-center gap-2">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-slate-300/60">Empty Slot</span>
+          </div>
+          <div class="rounded-2xl border-2 border-dashed border-slate-500/40 bg-slate-800/45 p-5 min-h-[230px] flex flex-col items-center justify-center text-center gap-2">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-slate-300/60">Empty Slot</span>
+          </div>
+          <div class="rounded-2xl border-2 border-dashed border-slate-500/40 bg-slate-800/45 p-5 min-h-[230px] flex flex-col items-center justify-center text-center gap-2">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-slate-300/60">Empty Slot</span>
+          </div>
+          <div class="rounded-2xl border-2 border-dashed border-slate-500/40 bg-slate-800/45 p-5 min-h-[230px] flex flex-col items-center justify-center text-center gap-2">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-slate-300/60">Empty Slot</span>
+          </div>
+          <div class="rounded-2xl border-2 border-dashed border-slate-500/40 bg-slate-800/45 p-5 min-h-[230px] flex flex-col items-center justify-center text-center gap-2">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-slate-300/60">Empty Slot</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="fixed bottom-3 left-4 text-[22px] font-medium tracking-wide text-white/55 pointer-events-none select-none z-10">
+      © ChiefStudioLabs
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // =========================================================================
+      // 1. CANVAS & ROBUST VIEWPORT INITIALIZATION
+      // =========================================================================
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      let viewW = window.innerWidth || document.documentElement.clientWidth || 1024;
+      let viewH = window.innerHeight || document.documentElement.clientHeight || 768;
+
+      function resizeCanvas() {
+        const w = window.innerWidth || document.documentElement.clientWidth || 1024;
+        const h = window.innerHeight || document.documentElement.clientHeight || 768;
+        viewW = Math.max(300, w);
+        viewH = Math.max(300, h);
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(viewW * dpr);
+        canvas.height = Math.round(viewH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      // Synchronous initialization before any rendering
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 60));
+      if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(() => resizeCanvas());
+        ro.observe(document.documentElement);
+      }
+
+      // =========================================================================
+      // 2. RINK CONSTANTS & MATCH CONFIGURATION (48.0m WIDE SHORT MAT)
+      // =========================================================================
+      const RINK_LENGTH = 48.0; // Total mat length (Z = 0 to 48.0m)
+      const RINK_HALF_W = 3.80; // Wide 7.6m footprint giving expansive room
+      const DITCH_Z = RINK_LENGTH - 2.2;
+      const BOX_Z_MIN = 1.8;
+      const BOX_Z_MAX = 4.4;
+      const BOX_HALF_W = 1.70;
+      const BLOCK_Z = 18.5;     // Solid wood center stick positioned closer to the delivery box
+      const BLOCK_HALF_W = 0.72; // Proportionate center stick width (1.44m total width)
+      const BLOCK_HALF_D = 0.09;
+
+      const JACK_DISTANCES = {
+        SHORT: 36.0,
+        MEDIUM: 38.5,
+        LONG: 41.0
+      };
+
+      const BOWL_RADIUS = 0.165;
+      const JACK_RADIUS = 0.095;
+      const MAX_ENDS = 3;
+      const BOWLS_PER_PLAYER = 4;
+      // Roll slow-down curve: 2 = constant friction, higher = longer gentle creep at the end
+      const ROLL_EASE_POWER = 2.6;
+
+      // =========================================================================
+      // 3. GAME STATE & AUDIO ENGINE
+      // =========================================================================
+      const audioSettings = {
+        music: true,
+        sfx: true
+      };
+      window.audioSettings = audioSettings;
+
+      let audioCtx = null;
+      let musicMasterGain = null;
+      let musicLoopTimer = null;
+      let musicChordStep = 0;
+
+      function ensureAudioContext() {
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return null;
+          if (!audioCtx) audioCtx = new Ctx();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          return audioCtx;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function playMenuTapSfx() {
+        if (!audioSettings.sfx) return;
+        const ac = ensureAudioContext();
+        if (!ac) return;
+        try {
+          const now = ac.currentTime;
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(240, now + 0.055);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.start(now);
+          osc.stop(now + 0.065);
+        } catch (_) {}
+      }
+
+      function playDeliverySfx(power) {
+        if (!audioSettings.sfx) return;
+        const ac = ensureAudioContext();
+        if (!ac) return;
+        try {
+          const now = ac.currentTime;
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.type = 'sine';
+          const startFreq = 120 + Math.min(180, power * 8);
+          osc.frequency.setValueAtTime(startFreq, now);
+          osc.frequency.exponentialRampToValueAtTime(65, now + 0.14);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.start(now);
+          osc.stop(now + 0.16);
+        } catch (_) {}
+      }
+
+      let lastClackTime = 0;
+      function playClackSfx(relSpeed) {
+        if (!audioSettings.sfx) return;
+        const nowMs = performance.now();
+        if (nowMs - lastClackTime < 45) return;
+        lastClackTime = nowMs;
+        const ac = ensureAudioContext();
+        if (!ac) return;
+        try {
+          const now = ac.currentTime;
+          const vol = Math.max(0.025, Math.min(0.22, relSpeed * 0.045));
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(860 + Math.random() * 140, now);
+          osc.frequency.exponentialRampToValueAtTime(260, now + 0.048);
+          gain.gain.setValueAtTime(vol, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.start(now);
+          osc.stop(now + 0.06);
+        } catch (_) {}
+      }
+
+      const LOUNGE_CHORDS = [
+        [261.63, 329.63, 392.00, 493.88], // Cmaj7
+        [220.00, 261.63, 329.63, 392.00], // Am7
+        [174.61, 220.00, 261.63, 329.63], // Fmaj7
+        [196.00, 246.94, 293.66, 349.23]  // G7sus4/G7
+      ];
+
+      function scheduleLoungeChord() {
+        if (!audioSettings.music || !audioCtx || !musicMasterGain) return;
+        const now = audioCtx.currentTime;
+        const chord = LOUNGE_CHORDS[musicChordStep % LOUNGE_CHORDS.length];
+        musicChordStep += 1;
+        chord.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const noteGain = audioCtx.createGain();
+          osc.type = idx === 0 ? 'sine' : 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+          noteGain.gain.setValueAtTime(0.0001, now + idx * 0.06);
+          noteGain.gain.linearRampToValueAtTime(idx === 0 ? 0.14 : 0.075, now + idx * 0.06 + 0.45);
+          noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.15);
+          osc.connect(noteGain);
+          noteGain.connect(musicMasterGain);
+          osc.start(now + idx * 0.06);
+          osc.stop(now + 3.25);
+        });
+      }
+
+      function syncBackgroundMusic(allowStartCtx = false) {
+        if (audioSettings.music) {
+          if (!audioCtx && !allowStartCtx) return;
+          const ac = ensureAudioContext();
+          if (!ac) return;
+          if (!musicMasterGain) {
+            musicMasterGain = ac.createGain();
+            musicMasterGain.gain.setValueAtTime(0.16, ac.currentTime);
+            musicMasterGain.connect(ac.destination);
+          } else {
+            musicMasterGain.gain.setTargetAtTime(0.16, ac.currentTime, 0.12);
+          }
+          if (!musicLoopTimer) {
+            scheduleLoungeChord();
+            musicLoopTimer = setInterval(scheduleLoungeChord, 3200);
+          }
+        } else {
+          if (musicLoopTimer) {
+            clearInterval(musicLoopTimer);
+            musicLoopTimer = null;
+          }
+          if (musicMasterGain && audioCtx) {
+            musicMasterGain.gain.setTargetAtTime(0.0001, audioCtx.currentTime, 0.08);
+          }
+        }
+      }
+
+      const state = {
+        gameMode: 'ai',      // 'ai' | '2p'
+        opponentName: 'Gary McNabb',
+        end: 1,
+        p1Score: 0,
+        p2Score: 0,
+        p1DeadJackCount: 0,
+        p2DeadJackCount: 0,
+        matOwner: 'P1',      // 'P1' (Player 1 / Red) or 'P2' (Gary McNabb / Player 2 / Blue)
+        turn: 'P1',
+        phase: 'MENU',       // 'MENU' | 'AIMING' | 'ROLLING' | 'HEAD_HOLD' | 'AI_THINKING' | 'SUMMARY' | 'JACK_SELECT'
+        hand: 'FH',          // 'FH' (Forehand: curves left) or 'BH' (Backhand: curves right)
+        aimDeg: 0.0,         // -32 to +32 degrees
+        power: 10.0,         // 0.0 to 20.0
+        deliveryPos: { x: 0.0, z: 3.1 },
+        placementLocked: false,
+        boxHover: null,
+        jackLength: 'MEDIUM',
+        jack: { x: 0.0, z: JACK_DISTANCES.MEDIUM, vx: 0, vz: 0, active: true, inDitch: false, ditchX: 0, ditchZ: 0 },
+        bowls: [],
+        p1BowlsLeft: BOWLS_PER_PLAYER,
+        p2BowlsLeft: BOWLS_PER_PLAYER,
+        headView: false,
+        autoHeadView: false,
+        pastStickTriggered: false,
+        pastStickTimer: 0,
+        headHoldTimer: 0,
+        camera: {
+          x: 0,
+          y: 2.55,
+          z: -3.80,
+          pitch: 0.13,
+          fov: Math.max(500, Math.min(viewW, viewH) * 0.90)
+        }
+      };
+
+      function isHumanTurn() {
+        if (state.phase !== 'AIMING') return false;
+        if (state.turn === 'P1') return state.p1BowlsLeft > 0;
+        return state.gameMode === '2p' && state.p2BowlsLeft > 0;
+      }
+
+      function getPlayerLabel(owner, style = 'scoreboard') {
+        if (state.gameMode === '2p') {
+          if (style === 'shot') return owner === 'P1' ? 'P1' : 'P2';
+          if (style === 'title') return owner === 'P1' ? 'Player 1' : 'Player 2';
+          return owner === 'P1' ? 'PLAYER 1' : 'PLAYER 2';
+        }
+        if (owner === 'P1') return 'YOU';
+        if (style === 'shot') return 'GARY';
+        if (style === 'title') return 'Gary McNabb';
+        return 'GARY MCNABB';
+      }
+
+      // UI References
+      const menuOverlay = document.getElementById('menu-overlay');
+      const hudRoot = document.getElementById('hud-root');
+      const hudEnd = document.getElementById('hud-end');
+      const hudP1Label = document.getElementById('hud-p1-label');
+      const hudP2Label = document.getElementById('hud-p2-label');
+      const hudP1Score = document.getElementById('hud-p1-score');
+      const hudP2Score = document.getElementById('hud-p2-score');
+      const headViewBtn = document.getElementById('head-view-btn');
+      const toastBanner = document.getElementById('toast-banner');
+      const toastText = document.getElementById('toast-text');
+      const btnFh = document.getElementById('btn-fh');
+      const btnBh = document.getElementById('btn-bh');
+      const bowlsBadge = document.getElementById('bowls-badge');
+      const summaryModal = document.getElementById('end-summary-modal');
+      const jackSelectModal = document.getElementById('jack-select-modal');
+
+      let toastTimer = null;
+      function showToast(msg, duration = 2600) {
+        toastText.textContent = msg;
+        toastBanner.classList.remove('opacity-0', '-translate-y-2');
+        toastBanner.classList.add('opacity-100', 'translate-y-0');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toastBanner.classList.add('opacity-0', '-translate-y-2');
+          toastBanner.classList.remove('opacity-100', 'translate-y-0');
+        }, duration);
+      }
+
+      // =========================================================================
+      // 4. TRAJECTORY & BIAS PHYSICS ENGINE
+      //    - Power 5 to 15: Distance-only scaling (constant lateral deflection!)
+      //    - Power < 5: Low-power gentle taper
+      //    - Power > 15: Firing drive straightening (15 -> full bias, 20 -> straight)
+      // =========================================================================
+      function getTargetDistanceForPower(power) {
+        // Maps power 0..20 smoothly across the 48m rink
+        // Power 0 -> 0m, Power 5 -> 16m, Power 10 -> ~31.5m (near Medium Jack), Power 15 -> ~47m, Power 20 -> ~65m (drive)
+        if (power <= 5.0) {
+          return (power / 5.0) * 16.0; // 0.0m to 16.0m
+        }
+        if (power <= 15.0) {
+          return 16.0 + ((power - 5.0) / 10.0) * 31.0; // 16.0m to 47.0m
+        }
+        return 47.0 + ((power - 15.0) / 5.0) * 18.0; // 47.0m to 65.0m (firing weight)
+      }
+
+      function getBiasStrengthForPower(power) {
+        if (power < 5.0) {
+          // Low-power gentle taper below 5
+          return Math.max(0.25, power / 5.0);
+        }
+        if (power <= 15.0) {
+          // Exact constant bias across 5 - 15 so power only scales forward distance
+          return 1.0;
+        }
+        // Only straighten out above 15 power (1.0 at 15 -> 0.14 at 20)
+        return Math.max(0.14, 1.0 - ((power - 15.0) / 5.0) * 0.86);
+      }
+
+      /**
+       * Computes lateral bias offset at forward progress u in [0, 1]
+       * Because u = forwardDist / totalForwardDist is invariant across power 5..15,
+       * the curve shape and lateral curl stay identical while distance scales!
+       */
+      function getLateralBiasAtProgress(u, hand, biasStrength) {
+        const dir = hand === 'FH' ? -1.0 : 1.0; // FH curves left (-X), BH curves right (+X)
+        const maxCurlMeters = 3.95; // Wide short-mat lateral draw curl matching wider mat
+        // Gentle early shoulder while fast, then sharply increasing bias hook when slowing down near rest (u -> 1)
+        const p = Math.max(0, Math.min(1, u));
+        const lateStoppingHook = 1.0 - Math.pow(1.0 - p, 0.58);
+        const curveProfile =
+          0.28 * Math.pow(p, 2.6) +
+          0.42 * Math.pow(p, 4.8) +
+          0.30 * Math.pow(p, 2.2) * lateStoppingHook;
+        return dir * maxCurlMeters * biasStrength * curveProfile;
+      }
+
+      const CENTER_AIM_REF_DIST = getTargetDistanceForPower(10.0);
+      const CENTER_AIM_REF_OFFSET_DEG = (Math.atan(3.95 / CENTER_AIM_REF_DIST) * 180) / Math.PI;
+      function getEffectiveAimDeg(aimDeg, hand) {
+        // At center aiming point (0 deg) and power 10 from mat center, FH aims right and BH aims left
+        // so both curl back to finish dead-center (x = 0).
+        return aimDeg + (hand === 'FH' ? CENTER_AIM_REF_OFFSET_DEG : -CENTER_AIM_REF_OFFSET_DEG);
+      }
+
+      function simulateTrajectory(startX, startZ, aimDeg, power, hand, allowOffSides = false, ignoreBlock = false) {
+        const totalDist = getTargetDistanceForPower(power);
+        const biasStrength = getBiasStrengthForPower(power);
+        const rad = (aimDeg * Math.PI) / 180;
+        const slopeX = Math.tan(rad);
+
+        const steps = 90;
+        const points = [{ x: startX, z: startZ }];
+        let hitBlock = false;
+        let outOfBounds = false;
+        let endX = startX;
+        let endZ = startZ;
+
+        for (let i = 1; i <= steps; i++) {
+          const u = i / steps;
+          const forwardZ = totalDist * u;
+          const z = startZ + forwardZ;
+          const straightX = startX + forwardZ * slopeX;
+          const biasX = getLateralBiasAtProgress(u, hand, biasStrength);
+          const x = straightX + biasX;
+
+          // Check center block collision
+          if (
+            !ignoreBlock &&
+            Math.abs(z - BLOCK_Z) <= BLOCK_HALF_D + BOWL_RADIUS &&
+            Math.abs(x) <= BLOCK_HALF_W + BOWL_RADIUS
+          ) {
+            hitBlock = true;
+            endX = x;
+            endZ = z;
+            points.push({ x, z });
+            break;
+          }
+
+          // Check side edges or far ditch
+          if (Math.abs(x) > RINK_HALF_W - BOWL_RADIUS * 0.35) {
+            outOfBounds = true;
+            if (!allowOffSides) {
+              endX = Math.max(-RINK_HALF_W, Math.min(RINK_HALF_W, x));
+              endZ = Math.min(RINK_LENGTH, z);
+              points.push({ x: endX, z: endZ });
+              break;
+            }
+          }
+
+          if (z > RINK_LENGTH - 0.15) {
+            outOfBounds = true;
+            endX = x;
+            endZ = RINK_LENGTH - 0.15;
+            points.push({ x: endX, z: endZ });
+            break;
+          }
+
+          endX = x;
+          endZ = z;
+          points.push({ x, z });
+        }
+
+        return {
+          points,
+          endX,
+          endZ,
+          totalDist,
+          biasStrength,
+          hitBlock,
+          outOfBounds
+        };
+      }
+
+      // =========================================================================
+      // 5. 3D PERSPECTIVE CAMERA & PROJECTION
+      // =========================================================================
+      let isPlacingBowl = false;
+
+      // =========================================================================
+      // 4b. SWIPE-TO-BOWL GESTURE MATH (replaces the old aim / power sliders + BOWL button)
+      //     Aim   = angle of the swipe vector (pointerdown -> pointerup), solved on the mat floor
+      //     Power = swipe velocity (distance / elapsed time), clamped to the physics range
+      // =========================================================================
+      const SWIPE_GRAB_RADIUS_PX = 72;  // swipe must start on / near the bowl (screen px)
+      const SWIPE_MIN_DIST_PX = 28;     // anything shorter counts as a tap and is cancelled
+      const SWIPE_MIN_TIME_MS = 60;     // floor on elapsed time so tiny flicks can't spike velocity
+      const SWIPE_MAX_AIM_DEG = 32;     // same aim range as the old slider (-32..+32 deg)
+      const SWIPE_MIN_POWER = 0.85;     // minimum swipe finishes just short of the 6.2m hog line
+      const SWIPE_MAX_POWER = 20.0;     // hard physics cap: 20 = full drive (~65 m), never exceeded
+      const SWIPE_FULL_SPEED = 2.8;     // swipe speed (screen-heights per second) that maps to max power
+      const SWIPE_POWER_CURVE = 0.78;   // < 1 gives finer control across the draw-weight range
+
+      const swipe = {
+        active: false,
+        pointerId: null,
+        startX: 0,
+        startY: 0,
+        startT: 0,
+        curX: 0,
+        curY: 0,
+        curT: 0,
+        valid: false
+      };
+
+      function clampNum(v, lo, hi) {
+        return Math.max(lo, Math.min(hi, v));
+      }
+
+      /**
+       * Swipe speed -> launch power.
+       * speed = distance / time, normalised by screen height so it feels the same on phone and desktop.
+       * A normal drag (~1.8-1.9 heights/s) gives roughly power 12 (about 37.7m roll to the head).
+       */
+      function swipeSpeedToPower(distPx, dtMs) {
+        const seconds = Math.max(SWIPE_MIN_TIME_MS, dtMs) / 1000;
+        const heightsPerSec = distPx / Math.max(1, viewH) / seconds;
+        const norm = clampNum(heightsPerSec / SWIPE_FULL_SPEED, 0, 1);
+        return clampNum(SWIPE_MAX_POWER * Math.pow(norm, SWIPE_POWER_CURVE), SWIPE_MIN_POWER, SWIPE_MAX_POWER);
+      }
+
+      /**
+       * Swipe direction (screen dx, dy) -> mat aim angle in degrees (0 = straight down the rink, + = right).
+       * The camera views the rink in perspective, so a screen angle is not the same as a floor angle.
+       * We binary-search the floor angle whose projected ray (bowl -> target depth) has the same on-screen
+       * direction as the swipe, so the aim point lands exactly where the finger is pointing.
+       */
+      function swipeVectorToAimDeg(dx, dy) {
+        const screenAngle = Math.atan2(dx, -dy); // 0 = straight up the screen
+        const bx = state.deliveryPos.x;
+        const bz = state.deliveryPos.z;
+        const fallback = clampNum((screenAngle * 180) / Math.PI, -SWIPE_MAX_AIM_DEG, SWIPE_MAX_AIM_DEG);
+        const p0 = project3D(bx, 0, bz);
+        if (!p0) return fallback;
+
+        const refDist = state.jack && state.jack.active
+          ? clampNum(state.jack.z - bz, 8, DITCH_Z - bz)
+          : CENTER_AIM_REF_DIST;
+        const projectedAngle = (deg) => {
+          const r = (deg * Math.PI) / 180;
+          const p1 = project3D(bx + Math.sin(r) * refDist, 0, bz + Math.cos(r) * refDist);
+          return p1 ? Math.atan2(p1.x - p0.x, -(p1.y - p0.y)) : null;
+        };
+
+        let lo = -SWIPE_MAX_AIM_DEG;
+        let hi = SWIPE_MAX_AIM_DEG;
+        const aLo = projectedAngle(lo);
+        const aHi = projectedAngle(hi);
+        if (aLo === null || aHi === null) return fallback;
+        if (screenAngle <= aLo) return lo;
+        if (screenAngle >= aHi) return hi;
+        for (let i = 0; i < 22; i++) {
+          const mid = (lo + hi) * 0.5;
+          const aMid = projectedAngle(mid);
+          if (aMid === null) break;
+          if (aMid < screenAngle) lo = mid;
+          else hi = mid;
+        }
+        return (lo + hi) * 0.5;
+      }
+
+      /** Full swipe -> shot conversion used by both the live preview and the release. */
+      function computeSwipeShot(startX, startY, endX, endY, dtMs) {
+        const dx = endX - startX;
+        const dy = endY - startY;
+        const dist = Math.hypot(dx, dy);
+        // Must travel far enough and mostly "up" the screen (down the rink) to count as a delivery
+        const forward = -dy > dist * 0.25;
+        return {
+          dist,
+          valid: dist >= SWIPE_MIN_DIST_PX && forward,
+          aimDeg: swipeVectorToAimDeg(dx, dy),
+          power: swipeSpeedToPower(dist, dtMs)
+        };
+      }
+
+      /** Live preview: pushes the in-progress swipe into state.aimDeg / state.power for the white line. */
+      function updateSwipePreview(now) {
+        if (!swipe.active) return;
+        const shot = computeSwipeShot(swipe.startX, swipe.startY, swipe.curX, swipe.curY, now - swipe.startT);
+        swipe.valid = shot.valid;
+        if (shot.dist >= 6) {
+          state.aimDeg = shot.aimDeg;
+          state.power = shot.power;
+        }
+        updateSwipeReadout();
+      }
+
+      function updateSwipeReadout() {
+        const readout = document.getElementById('swipe-power-readout');
+        const hint = document.getElementById('swipe-hint');
+        if (!readout || !hint) return;
+        if (swipe.active) {
+          readout.textContent = `POWER ${state.power.toFixed(1)}`;
+          readout.className = state.power > 15
+            ? 'text-sm font-black text-red-400 tabular-nums'
+            : 'text-sm font-black text-yellow-400 tabular-nums';
+          hint.textContent = swipe.valid ? 'Release to bowl' : 'Keep swiping up';
+        } else {
+          readout.textContent = 'POWER --';
+          readout.className = 'text-sm font-black text-yellow-400 tabular-nums';
+          hint.textContent = 'Swipe up from your bowl';
+        }
+      }
+
+      function resetSwipeState() {
+        swipe.active = false;
+        swipe.pointerId = null;
+        swipe.valid = false;
+        updateSwipeReadout();
+      }
+
+      function getTargetCamera() {
+        const minDim = Math.min(viewW, viewH);
+        if (state.headView || state.autoHeadView) {
+          const focusX = Math.max(-2.2, Math.min(2.2, state.jack.x * 0.65));
+          const focusZ = Math.min(45.5, Math.max(25.0, state.jack.z));
+          return {
+            x: focusX,
+            y: 9.0,
+            z: focusZ - 6.0,
+            pitch: -0.82,
+            fov: Math.max(460, minDim * 1.05)
+          };
+        }
+
+        let focusX = state.deliveryPos.x;
+        let focusZ = state.deliveryPos.z;
+        if (state.phase === 'AIMING' && (isPlacingBowl || swipe.active)) {
+          focusX = state.camera.x;
+          focusZ = state.camera.z + 6.90;
+        } else if (state.phase === 'ROLLING') {
+          const activeShot = state.bowls.find((b) => b.isActiveShot);
+          if (activeShot) {
+            focusX = activeShot.startX;
+            focusZ = activeShot.startZ;
+          }
+        } else if (state.phase === 'AI_THINKING' || state.phase === 'MENU') {
+          focusX = 0;
+          focusZ = 3.1;
+        }
+
+        return {
+          x: focusX,
+          y: 2.55,
+          z: focusZ - 6.90,
+          pitch: 0.13,
+          fov: Math.max(500, minDim * 0.90)
+        };
+      }
+
+      function updateCamera(dt) {
+        const target = getTargetCamera();
+        const k = Math.min(1, dt * 8.5);
+        state.camera.x += (target.x - state.camera.x) * k;
+        state.camera.y += (target.y - state.camera.y) * k;
+        state.camera.z += (target.z - state.camera.z) * k;
+        state.camera.pitch += (target.pitch - state.camera.pitch) * k;
+        state.camera.fov += (target.fov - state.camera.fov) * k;
+      }
+
+      function project3D(wx, wy, wz) {
+        const dx = wx - state.camera.x;
+        const dy = wy - state.camera.y;
+        const dz = wz - state.camera.z;
+
+        const cosP = Math.cos(state.camera.pitch);
+        const sinP = Math.sin(state.camera.pitch);
+
+        const cy = dy * cosP - dz * sinP;
+        const cz = dy * sinP + dz * cosP;
+
+        if (cz <= 0.15) return null;
+
+        const scale = state.camera.fov / cz;
+        const sx = viewW * 0.5 + dx * scale;
+        const sy = viewH * 0.40 - cy * scale;
+
+        return { x: sx, y: sy, scale, depth: cz };
+      }
+
+      function screenToMatFloor(sx, sy) {
+        const cosP = Math.cos(state.camera.pitch);
+        const sinP = Math.sin(state.camera.pitch);
+        const nx = (sx - viewW * 0.5) / state.camera.fov;
+        const ny = (viewH * 0.40 - sy) / state.camera.fov;
+
+        const ry = ny * cosP + sinP;
+        const rz = -ny * sinP + cosP;
+        if (Math.abs(ry) < 1e-5) return null;
+
+        const t = -state.camera.y / ry;
+        if (t <= 0) return null;
+
+        const wx = state.camera.x + nx * t;
+        const wz = state.camera.z + rz * t;
+        return { x: wx, z: wz };
+      }
+
+      // =========================================================================
+      // 6. 3D ARENA & SHORT MAT RENDERING
+      // =========================================================================
+      function drawQuad3D(p1, p2, p3, p4, fillStyle, strokeStyle = null, lineWidth = 1) {
+        const s1 = project3D(p1.x, p1.y, p1.z);
+        const s2 = project3D(p2.x, p2.y, p2.z);
+        const s3 = project3D(p3.x, p3.y, p3.z);
+        const s4 = project3D(p4.x, p4.y, p4.z);
+        if (!s1 || !s2 || !s3 || !s4) return;
+
+        ctx.beginPath();
+        ctx.moveTo(s1.x, s1.y);
+        ctx.lineTo(s2.x, s2.y);
+        ctx.lineTo(s3.x, s3.y);
+        ctx.lineTo(s4.x, s4.y);
+        ctx.closePath();
+        if (fillStyle) {
+          ctx.fillStyle = fillStyle;
+          ctx.fill();
+        }
+        if (strokeStyle) {
+          ctx.strokeStyle = strokeStyle;
+          ctx.lineWidth = lineWidth;
+          ctx.stroke();
+        }
+      }
+
+      function drawLine3D(p1, p2, strokeStyle, lineWidth = 2) {
+        const s1 = project3D(p1.x, p1.y, p1.z);
+        const s2 = project3D(p2.x, p2.y, p2.z);
+        if (!s1 || !s2) return;
+        ctx.beginPath();
+        ctx.moveTo(s1.x, s1.y);
+        ctx.lineTo(s2.x, s2.y);
+        ctx.strokeStyle = strokeStyle;
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+      }
+
+      function drawJack(wx, wz) {
+        const centerProj = project3D(wx, JACK_RADIUS, wz);
+        const groundProj = project3D(wx, 0, wz);
+        if (!centerProj || !groundProj) return;
+
+        const rPx = Math.max(3.2, JACK_RADIUS * centerProj.scale);
+
+        // Ground contact shadow
+        ctx.beginPath();
+        ctx.ellipse(
+          groundProj.x,
+          groundProj.y + rPx * 0.08,
+          rPx * 1.08,
+          rPx * 0.38,
+          0,
+          0,
+          Math.PI * 2
+        );
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.36)';
+        ctx.fill();
+
+        // Solid matte yellow jack sphere
+        ctx.beginPath();
+        ctx.arc(centerProj.x, centerProj.y, rPx, 0, Math.PI * 2);
+        ctx.fillStyle = '#facc15';
+        ctx.fill();
+
+        // Thinner, refined outline
+        ctx.lineWidth = Math.max(0.75, rPx * 0.045);
+        ctx.strokeStyle = '#a16207';
+        ctx.stroke();
+      }
+
+      // =========================================================================
+      // 6b. COOL BOWL RENDERING (glossy lacquer, rolling grooves, bias emblem,
+      //     motion trails & pulsing "SHOT" bowl indicator)
+      // =========================================================================
+      const BOWL_PALETTES = {
+        P1: { light: '#fecaca', base: '#dc2626', dark: '#450a0a', outline: '#7f1d1d', trail: '248, 113, 113', emblem: '#fde68a' },
+        P2: { light: '#bfdbfe', base: '#2563eb', dark: '#0b1b4d', outline: '#1e3a8a', trail: '96, 165, 250', emblem: '#fde68a' }
+      };
+
+      function drawBowl(b) {
+        const pal = BOWL_PALETTES[b.owner] || BOWL_PALETTES.P1;
+        const c = project3D(b.x, BOWL_RADIUS, b.z);
+        const g = project3D(b.x, 0, b.z);
+        if (!c || !g) return;
+
+        const rPx = Math.max(4, BOWL_RADIUS * c.scale);
+        const rx = rPx * 0.76; // Bowls are squashed discs rolling on their edge
+        const ry = rPx;
+        const spin = b.spin || 0;
+
+        // Soft ground contact shadow
+        ctx.beginPath();
+        ctx.ellipse(g.x, g.y + rPx * 0.08, rx * 1.3, rPx * 0.4, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.42)';
+        ctx.fill();
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(c.x, c.y, rx, ry, 0, 0, Math.PI * 2);
+
+        // Lacquered body gradient
+        const body = ctx.createRadialGradient(
+          c.x - rx * 0.35, c.y - ry * 0.45, rPx * 0.08,
+          c.x, c.y, rPx * 1.15
+        );
+        body.addColorStop(0, pal.light);
+        body.addColorStop(0.32, pal.base);
+        body.addColorStop(1, pal.dark);
+        ctx.fillStyle = body;
+        ctx.fill();
+        ctx.clip();
+
+        // Rolling grip grooves (rotate with distance travelled)
+        const grooveW = Math.max(1, rPx * 0.07);
+        for (let i = 0; i < 6; i++) {
+          const theta = spin + (i * Math.PI) / 3;
+          const facing = Math.cos(theta);
+          if (facing <= 0.12) continue;
+          const y = c.y - ry * Math.sin(theta) * 0.94;
+          ctx.beginPath();
+          ctx.moveTo(c.x - rx, y);
+          ctx.lineTo(c.x + rx, y);
+          ctx.strokeStyle = `rgba(0, 0, 0, ${0.38 * facing})`;
+          ctx.lineWidth = grooveW;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(c.x - rx, y + grooveW);
+          ctx.lineTo(c.x + rx, y + grooveW);
+          ctx.strokeStyle = `rgba(255, 255, 255, ${0.14 * facing})`;
+          ctx.lineWidth = grooveW * 0.6;
+          ctx.stroke();
+        }
+
+        // Gold bias emblem on the bias side of the bowl
+        const biasSide = b.hand === 'BH' ? 1 : -1;
+        const ex = c.x + biasSide * rx * 0.66;
+        ctx.beginPath();
+        ctx.ellipse(ex, c.y, rPx * 0.16, rPx * 0.3, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = pal.emblem;
+        ctx.lineWidth = Math.max(1, rPx * 0.07);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.ellipse(ex, c.y, rPx * 0.06, rPx * 0.12, 0, 0, Math.PI * 2);
+        ctx.fillStyle = pal.emblem;
+        ctx.fill();
+
+        // Centre sheen band + specular highlight
+        ctx.beginPath();
+        ctx.ellipse(c.x - rx * 0.12, c.y, rx * 0.22, ry * 0.95, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.10)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(c.x - rx * 0.32, c.y - ry * 0.48, rx * 0.26, ry * 0.15, -0.35, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.fill();
+        ctx.restore();
+
+        // Crisp rim outline
+        ctx.beginPath();
+        ctx.ellipse(c.x, c.y, rx, ry, 0, 0, Math.PI * 2);
+        ctx.lineWidth = Math.max(1.2, rPx * 0.08);
+        ctx.strokeStyle = pal.outline;
+        ctx.stroke();
+      }
+
+      function drawBowlTrail(b) {
+        if (!b.trail || b.trail.length < 2) return;
+        const pal = BOWL_PALETTES[b.owner] || BOWL_PALETTES.P1;
+        const n = b.trail.length;
+        ctx.lineCap = 'round';
+        for (let i = 1; i < n; i++) {
+          const p0 = project3D(b.trail[i - 1].x, 0.005, b.trail[i - 1].z);
+          const p1 = project3D(b.trail[i].x, 0.005, b.trail[i].z);
+          if (!p0 || !p1) continue;
+          const t = i / n;
+          ctx.beginPath();
+          ctx.moveTo(p0.x, p0.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.strokeStyle = `rgba(${pal.trail}, ${0.55 * t})`;
+          ctx.lineWidth = Math.max(1, BOWL_RADIUS * p1.scale * 0.9 * t);
+          ctx.stroke();
+        }
+      }
+
+      function drawCenterBlock() {
+        const h = 0.095;
+        const x0 = -BLOCK_HALF_W;
+        const x1 = BLOCK_HALF_W;
+        const z0 = BLOCK_Z - BLOCK_HALF_D;
+        const z1 = BLOCK_Z + BLOCK_HALF_D;
+
+        // Shadow
+        drawQuad3D(
+          { x: x0 - 0.03, y: 0, z: z0 - 0.03 },
+          { x: x1 + 0.03, y: 0, z: z0 - 0.03 },
+          { x: x1 + 0.03, y: 0, z: z1 + 0.04 },
+          { x: x0 - 0.03, y: 0, z: z1 + 0.04 },
+          'rgba(0, 0, 0, 0.42)'
+        );
+        // Front face
+        drawQuad3D(
+          { x: x0, y: 0, z: z0 },
+          { x: x1, y: 0, z: z0 },
+          { x: x1, y: h, z: z0 },
+          { x: x0, y: h, z: z0 },
+          '#78350f',
+          '#451a03',
+          1
+        );
+        // Top timber face
+        drawQuad3D(
+          { x: x0, y: h, z: z0 },
+          { x: x1, y: h, z: z0 },
+          { x: x1, y: h, z: z1 },
+          { x: x0, y: h, z: z1 },
+          '#b45309',
+          '#78350f',
+          1
+        );
+        // Yellow warning stripe along the top of the 1.75x wider center stick
+        drawQuad3D(
+          { x: x0 + 0.04, y: h + 0.002, z: z0 + 0.03 },
+          { x: x1 - 0.04, y: h + 0.002, z: z0 + 0.03 },
+          { x: x1 - 0.04, y: h + 0.002, z: z1 - 0.03 },
+          { x: x0 + 0.04, y: h + 0.002, z: z1 - 0.03 },
+          '#facc15'
+        );
+      }
+
+      const SPECTATORS = [
+        { x:  0.25, z: 57.40, h: 8.10, shirt: '#f8fafc', pants: '#0f172a', skin: '#f3cfb3', hair: '#92400e', hat: '#dc2626', phase: 0.9 },
+        { x:  6.60, z: 56.70, h: 7.95, shirt: '#a78bfa', pants: '#334155', skin: '#f1c27d', hair: '#78350f', hat: null, phase: 4.3 },
+        { x: -6.30, z: 56.50, h: 7.35, shirt: '#fb7185', pants: '#334155', skin: '#e6b89c', hair: '#1e293b', hat: '#fef08a', phase: 1.4 },
+        { x:  9.80, z: 55.30, h: 7.60, shirt: '#fb923c', pants: '#1e293b', skin: '#f5cfa0', hair: '#cbd5e1', hat: '#1d4ed8', phase: 5.0 },
+        { x: -9.60, z: 55.10, h: 7.75, shirt: '#38bdf8', pants: '#1e293b', skin: '#f5cfa0', hair: '#451a03', hat: null, phase: 0.2 },
+        { x:  3.45, z: 54.80, h: 7.40, shirt: '#34d399', pants: '#1e293b', skin: '#8d5524', hair: '#09090b', hat: null, phase: 3.1 },
+        { x: -3.15, z: 54.60, h: 8.15, shirt: '#facc15', pants: '#1e3a8a', skin: '#d99b72', hair: '#292524', hat: null, phase: 2.5 }
+      ];
+
+      const spectatorLook = { x: 0, z: JACK_DISTANCES.MEDIUM, initialized: false, lastSec: 0 };
+
+      function drawCartoonSpectator(p, nowSec, targetX, targetZ) {
+        const base = project3D(p.x, 0, p.z);
+        const top = project3D(p.x, p.h, p.z);
+        if (!base || !top) return;
+        if (base.y > viewH + 140 || top.y < -140) return;
+
+        const H = Math.max(18, base.y - top.y);
+        const cx = base.x;
+        const by = base.y;
+        const bob = Math.sin(nowSec * 2.0 + p.phase) * (H * 0.014);
+
+        // 3D gaze angles toward either the head or the delivered bowl rolling down the mat
+        const dz = Math.max(2.0, p.z - targetZ);
+        const yaw = Math.atan2(targetX - p.x, dz);
+        const gazeX = Math.max(-1, Math.min(1, yaw / 0.55));
+        const pitchDown = Math.atan2(p.h * 0.81, dz);
+        const lookDown = Math.max(-0.55, Math.min(1, (pitchDown - 0.21) / 0.19));
+
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        // Simple legs + shoes
+        const hipY = by - H * 0.34 + bob * 0.5;
+        const footY = by - H * 0.03;
+        const legSpread = H * 0.085;
+        ctx.strokeStyle = p.pants;
+        ctx.lineWidth = Math.max(2, H * 0.10);
+        ctx.beginPath();
+        ctx.moveTo(cx - legSpread, hipY);
+        ctx.lineTo(cx - legSpread, footY);
+        ctx.moveTo(cx + legSpread, hipY);
+        ctx.lineTo(cx + legSpread, footY);
+        ctx.stroke();
+
+        // Shoes
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.ellipse(cx - legSpread, by - H * 0.01, H * 0.065, H * 0.03, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx + legSpread, by - H * 0.01, H * 0.065, H * 0.03, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Arms hanging relaxed at sides
+        const shoulderY = by - H * 0.60 + bob;
+        const handY = by - H * 0.36 + bob;
+        const armOffset = H * 0.19;
+        ctx.strokeStyle = p.shirt;
+        ctx.lineWidth = Math.max(2, H * 0.085);
+        ctx.beginPath();
+        ctx.moveTo(cx - armOffset * 0.88, shoulderY);
+        ctx.lineTo(cx - armOffset, handY);
+        ctx.moveTo(cx + armOffset * 0.88, shoulderY);
+        ctx.lineTo(cx + armOffset, handY);
+        ctx.stroke();
+
+        // Little hands
+        ctx.fillStyle = p.skin;
+        ctx.beginPath();
+        ctx.arc(cx - armOffset, handY, Math.max(1.2, H * 0.04), 0, Math.PI * 2);
+        ctx.arc(cx + armOffset, handY, Math.max(1.2, H * 0.04), 0, Math.PI * 2);
+        ctx.fill();
+
+        // Torso
+        const torsoW = H * 0.32;
+        const torsoTop = by - H * 0.65 + bob;
+        const torsoBot = by - H * 0.30 + bob * 0.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, torsoTop);
+        ctx.lineTo(cx, torsoBot);
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.45)';
+        ctx.lineWidth = torsoW + Math.max(1.5, H * 0.04);
+        ctx.stroke();
+        ctx.strokeStyle = p.shirt;
+        ctx.lineWidth = torsoW;
+        ctx.stroke();
+
+        // Cartoon head
+        const headR = Math.max(3.5, H * 0.185);
+        const headX = cx + gazeX * headR * 0.12;
+        const headY = by - H * 0.81 + bob + lookDown * headR * 0.08;
+
+        ctx.beginPath();
+        ctx.arc(headX, headY, headR, 0, Math.PI * 2);
+        ctx.fillStyle = p.skin;
+        ctx.fill();
+        ctx.lineWidth = Math.max(1, H * 0.025);
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.45)';
+        ctx.stroke();
+
+        // Simple hair cap or bowls hat
+        if (p.hat) {
+          ctx.beginPath();
+          ctx.arc(headX, headY - headR * 0.12, headR * 1.03, Math.PI, 0);
+          ctx.closePath();
+          ctx.fillStyle = p.hat;
+          ctx.fill();
+          // Cap brim
+          ctx.beginPath();
+          ctx.ellipse(
+            headX + gazeX * headR * 0.15,
+            headY - headR * 0.12 + lookDown * headR * 0.08,
+            headR * 1.15,
+            headR * 0.22,
+            0,
+            0,
+            Math.PI * 2
+          );
+          ctx.fillStyle = p.hat;
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(headX, headY - headR * 0.1, headR * 1.02, Math.PI * 1.05, -Math.PI * 0.05);
+          ctx.fillStyle = p.hair;
+          ctx.fill();
+        }
+
+        // Cartoon eyes tracking the target (head while waiting, delivered bowl once rolling)
+        const faceCenterX = headX + gazeX * headR * 0.24;
+        const faceCenterY = headY + lookDown * headR * 0.10;
+        const eyeY = faceCenterY + headR * 0.10;
+        const eyeSep = headR * 0.36;
+        const eyeR = Math.max(1.1, headR * 0.22);
+        const pupilR = Math.max(0.7, eyeR * 0.56);
+        const pupilShiftX = gazeX * eyeR * 0.44;
+        const pupilShiftY = lookDown * eyeR * 0.48;
+
+        // Eye whites
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(faceCenterX - eyeSep, eyeY, eyeR, 0, Math.PI * 2);
+        ctx.arc(faceCenterX + eyeSep, eyeY, eyeR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pupils tracking target
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(faceCenterX - eyeSep + pupilShiftX, eyeY + pupilShiftY, pupilR, 0, Math.PI * 2);
+        ctx.arc(faceCenterX + eyeSep + pupilShiftX, eyeY + pupilShiftY, pupilR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Small smile
+        ctx.beginPath();
+        ctx.arc(faceCenterX, faceCenterY + headR * 0.40, headR * 0.22, 0.15 * Math.PI, 0.85 * Math.PI);
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.7)';
+        ctx.lineWidth = Math.max(0.8, headR * 0.11);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawSkySun(nowSec) {
+        if (state.headView || state.autoHeadView) return;
+        const blueGuyHead = project3D(-9.60, 7.75, 55.10);
+        if (!blueGuyHead) return;
+
+        let endCenterX = Math.max(60, viewW * 0.5 - 190);
+        let scoreboardBottom = 120;
+        if (hudEnd && typeof hudEnd.getBoundingClientRect === 'function') {
+          const er = hudEnd.getBoundingClientRect();
+          if (er && er.width > 0) endCenterX = er.left + er.width * 0.5;
+          const headerEl = hudEnd.closest('header');
+          if (headerEl) {
+            const hr = headerEl.getBoundingClientRect();
+            if (hr && hr.height > 0) scoreboardBottom = hr.bottom;
+          }
+        }
+
+        const sunX = Math.max(82, viewW * 0.11);
+        const sunY = Math.max(115, (scoreboardBottom + blueGuyHead.y) * 0.46);
+        const sunR = Math.max(42, Math.min(68, viewH * 0.075));
+
+        ctx.save();
+        // Warm outer atmospheric glow
+        const glow = ctx.createRadialGradient(sunX, sunY, sunR * 0.35, sunX, sunY, sunR * 2.8);
+        glow.addColorStop(0, 'rgba(253, 224, 71, 0.42)');
+        glow.addColorStop(0.55, 'rgba(250, 204, 21, 0.14)');
+        glow.addColorStop(1, 'rgba(250, 204, 21, 0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, sunR * 2.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Simple cartoon rotating rays
+        const numRays = 10;
+        const spin = nowSec * 0.25;
+        ctx.strokeStyle = '#fde047';
+        ctx.lineWidth = Math.max(2.5, sunR * 0.16);
+        ctx.lineCap = 'round';
+        for (let i = 0; i < numRays; i++) {
+          const a = spin + (i * Math.PI * 2) / numRays;
+          const r1 = sunR * 1.24;
+          const r2 = sunR * 1.68;
+          ctx.beginPath();
+          ctx.moveTo(sunX + Math.cos(a) * r1, sunY + Math.sin(a) * r1);
+          ctx.lineTo(sunX + Math.cos(a) * r2, sunY + Math.sin(a) * r2);
+          ctx.stroke();
+        }
+
+        // Bright golden cartoon sun disc
+        const discGrad = ctx.createRadialGradient(
+          sunX - sunR * 0.25,
+          sunY - sunR * 0.25,
+          sunR * 0.1,
+          sunX,
+          sunY,
+          sunR
+        );
+        discGrad.addColorStop(0, '#fef9c3');
+        discGrad.addColorStop(0.55, '#facc15');
+        discGrad.addColorStop(1, '#f59e0b');
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, sunR, 0, Math.PI * 2);
+        ctx.fillStyle = discGrad;
+        ctx.fill();
+        ctx.lineWidth = Math.max(1.5, sunR * 0.08);
+        ctx.strokeStyle = '#eab308';
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawSkyClouds(nowSec) {
+        if (state.headView || state.autoHeadView) return;
+
+        const drawCloud = (cx, cy, scale, driftAmp, speed, phase) => {
+          const x = cx + Math.sin(nowSec * speed + phase) * driftAmp;
+          const y = cy + Math.cos(nowSec * speed * 0.7 + phase) * (driftAmp * 0.14);
+
+          ctx.save();
+          // Soft subtle shadow underneath the cloud
+          ctx.fillStyle = 'rgba(148, 197, 232, 0.45)';
+          ctx.beginPath();
+          ctx.ellipse(x, y + 14 * scale, 54 * scale, 12 * scale, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Fluffy white cloud puffs
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+          ctx.beginPath();
+          ctx.arc(x - 30 * scale, y + 4 * scale, 20 * scale, 0, Math.PI * 2);
+          ctx.arc(x - 10 * scale, y - 10 * scale, 26 * scale, 0, Math.PI * 2);
+          ctx.arc(x + 16 * scale, y - 6 * scale, 23 * scale, 0, Math.PI * 2);
+          ctx.arc(x + 34 * scale, y + 5 * scale, 18 * scale, 0, Math.PI * 2);
+          ctx.ellipse(x + 2 * scale, y + 9 * scale, 46 * scale, 15 * scale, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        };
+
+        const cloudScale = Math.max(0.75, Math.min(1.25, viewW / 1100));
+        // Mix of larger, medium, and smaller white clouds across the upper sky
+        drawCloud(viewW * 0.13, Math.max(76, viewH * 0.12), cloudScale * 0.68, 8, 0.20, 0.7);
+        drawCloud(viewW * 0.27, Math.max(94, viewH * 0.16), cloudScale * 1.24, 11, 0.16, 0.0);
+        drawCloud(viewW * 0.48, Math.max(72, viewH * 0.11), cloudScale * 0.62, 9, 0.22, 3.4);
+        drawCloud(viewW * 0.65, Math.max(106, viewH * 0.19), cloudScale * 0.80, 10, 0.19, 1.3);
+        drawCloud(viewW * 0.80, Math.max(88, viewH * 0.14), cloudScale * 1.18, 13, 0.14, 2.1);
+        drawCloud(viewW * 0.92, Math.max(118, viewH * 0.21), cloudScale * 0.65, 7, 0.21, 4.6);
+      }
+
+      function renderScene() {
+        const nowSec = performance.now() * 0.001;
+
+        // 1. Light Blue Sky Backdrop & Timber Floor Surround
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, viewH * 0.72);
+        skyGrad.addColorStop(0, '#7dd3fc');
+        skyGrad.addColorStop(0.55, '#bae6fd');
+        skyGrad.addColorStop(1, '#e0f2fe');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, viewW, viewH);
+
+        // Two fluffy white clouds and cartoon sun in the sky
+        drawSkyClouds(nowSec);
+        drawSkySun(nowSec);
+
+        // Wooden hall surround apron
+        drawQuad3D(
+          { x: -RINK_HALF_W - 9.0, y: -0.01, z: -2.0 },
+          { x: RINK_HALF_W + 9.0, y: -0.01, z: -2.0 },
+          { x: RINK_HALF_W + 9.0, y: -0.01, z: RINK_LENGTH + 12.0 },
+          { x: -RINK_HALF_W - 9.0, y: -0.01, z: RINK_LENGTH + 12.0 },
+          '#2b211a'
+        );
+
+        // Spectators watch the head while waiting, then track the delivered bowl coming down the mat
+        {
+          let desiredX = state.jack.active ? state.jack.x : 0;
+          let desiredZ = state.jack.active ? state.jack.z : JACK_DISTANCES[state.jackLength];
+
+          if (state.phase === 'ROLLING') {
+            let trackedBowl = state.bowls.find((b) => !b.dead && b.rolling);
+            if (!trackedBowl) {
+              for (let i = state.bowls.length - 1; i >= 0; i--) {
+                const b = state.bowls[i];
+                if (!b.dead && Math.hypot(b.vx, b.vz) > 0.04) {
+                  trackedBowl = b;
+                  break;
+                }
+              }
+            }
+            if (trackedBowl) {
+              desiredX = trackedBowl.x;
+              desiredZ = trackedBowl.z;
+            }
+          }
+
+          if (!spectatorLook.initialized) {
+            spectatorLook.x = desiredX;
+            spectatorLook.z = desiredZ;
+            spectatorLook.lastSec = nowSec;
+            spectatorLook.initialized = true;
+          } else {
+            const gazeDt = Math.max(0.001, Math.min(0.1, nowSec - spectatorLook.lastSec));
+            spectatorLook.lastSec = nowSec;
+            const followRate = state.phase === 'ROLLING' ? 14 : 7;
+            const alpha = 1 - Math.exp(-followRate * gazeDt);
+            spectatorLook.x += (desiredX - spectatorLook.x) * alpha;
+            spectatorLook.z += (desiredZ - spectatorLook.z) * alpha;
+          }
+
+          if (!state.headView && !state.autoHeadView) {
+            for (let i = 0; i < SPECTATORS.length; i++) {
+              drawCartoonSpectator(SPECTATORS[i], nowSec, spectatorLook.x, spectatorLook.z);
+            }
+          }
+        }
+
+        // 2. Thick Woven Green Short Mat Carpet (Segmented strips for rich 3D depth)
+        const segments = 24;
+        const segLen = RINK_LENGTH / segments;
+        for (let i = 0; i < segments; i++) {
+          const z0 = i * segLen;
+          const z1 = (i + 1) * segLen;
+          const carpetColor = i % 2 === 0 ? '#1f7346' : '#1a663d';
+          drawQuad3D(
+            { x: -RINK_HALF_W, y: 0, z: z0 },
+            { x: RINK_HALF_W, y: 0, z: z0 },
+            { x: RINK_HALF_W, y: 0, z: z1 },
+            { x: -RINK_HALF_W, y: 0, z: z1 },
+            carpetColor
+          );
+        }
+
+        // 4. Crisp White Rink Markings
+        // Side boundary lines
+        drawLine3D({ x: -RINK_HALF_W + 0.04, y: 0.002, z: 0 }, { x: -RINK_HALF_W + 0.04, y: 0.002, z: RINK_LENGTH }, 'rgba(255,255,255,0.72)', 2);
+        drawLine3D({ x: RINK_HALF_W - 0.04, y: 0.002, z: 0 }, { x: RINK_HALF_W - 0.04, y: 0.002, z: RINK_LENGTH }, 'rgba(255,255,255,0.72)', 2);
+        // Center line
+        drawLine3D({ x: 0, y: 0.002, z: BOX_Z_MAX }, { x: 0, y: 0.002, z: RINK_LENGTH - 0.4 }, 'rgba(255,255,255,0.18)', 1.5);
+        // Foot / Hog line & Far Head / Ditch line
+        drawLine3D({ x: -RINK_HALF_W, y: 0.002, z: 6.2 }, { x: RINK_HALF_W, y: 0.002, z: 6.2 }, 'rgba(255,255,255,0.35)', 1.5);
+        drawLine3D({ x: -RINK_HALF_W, y: 0.002, z: DITCH_Z }, { x: RINK_HALF_W, y: 0.002, z: DITCH_Z }, 'rgba(255,255,255,0.55)', 2);
+
+        // Short / Medium / Long jack spot ticks along center line
+        for (const key of ['SHORT', 'MEDIUM', 'LONG']) {
+          const jz = JACK_DISTANCES[key];
+          drawLine3D({ x: -0.18, y: 0.002, z: jz }, { x: 0.18, y: 0.002, z: jz }, 'rgba(255,255,255,0.45)', 2);
+        }
+
+        // Anchored ditch spot marker when jack has entered the ditch
+        if (state.jack.inDitch) {
+          const dp = project3D(state.jack.ditchX, 0.004, state.jack.ditchZ);
+          if (dp) {
+            const rx = Math.max(4.5, JACK_RADIUS * 1.6 * dp.scale);
+            const ry = rx * 0.48;
+            ctx.beginPath();
+            ctx.ellipse(dp.x, dp.y, rx, ry, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.88)';
+            ctx.setLineDash([3, 3]);
+            ctx.lineWidth = 1.6;
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+
+        // Bold "Place Bowl" written flat on the mat between start of mat (z=0) and delivery box (z=BOX_Z_MIN)
+        // Only shown when placement is unlocked; removed when placement is locked
+        if (!state.placementLocked && isHumanTurn()) {
+          const textZ = BOX_Z_MIN * 0.5; // 0.90m
+          const pC = project3D(0, 0.003, textZ);
+          const pR = project3D(1.0, 0.003, textZ);
+          const pF = project3D(0, 0.003, textZ + 1.0);
+          if (pC && pR && pF) {
+            const uxX = pR.x - pC.x;
+            const uxY = pR.y - pC.y;
+            const uyX = pC.x - pF.x;
+            const uyY = pC.y - pF.y;
+            const pxPerMeter = Math.hypot(uxX, uxY);
+            if (pxPerMeter > 8) {
+              ctx.save();
+              ctx.transform(uxX, uxY, uyX, uyY, pC.x, pC.y);
+              // Scale so text sits comfortably inside the mat width (~1.9m wide) and 0..1.8m depth
+              const s = 0.011;
+              ctx.scale(s, s);
+              ctx.font = '900 44px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.shadowColor = 'rgba(255, 255, 255, 0.75)';
+              ctx.shadowBlur = 12;
+              ctx.fillStyle = '#ffffff';
+              ctx.strokeStyle = 'rgba(4, 47, 36, 0.78)';
+              ctx.lineWidth = 4.5;
+              ctx.lineJoin = 'round';
+              ctx.strokeText('Place Bowl', 0, 0);
+              ctx.fillText('Place Bowl', 0, 0);
+              ctx.restore();
+            }
+          }
+        }
+
+        // White Delivery Box
+        drawQuad3D(
+          { x: -BOX_HALF_W, y: 0.003, z: BOX_Z_MIN },
+          { x: BOX_HALF_W, y: 0.003, z: BOX_Z_MIN },
+          { x: BOX_HALF_W, y: 0.003, z: BOX_Z_MAX },
+          { x: -BOX_HALF_W, y: 0.003, z: BOX_Z_MAX },
+          'rgba(255, 255, 255, 0.11)',
+          'rgba(255, 255, 255, 0.95)',
+          2.5
+        );
+
+        // Placement footprint marker & hover reticle inside the delivery box
+        if (isHumanTurn()) {
+          const spot = project3D(state.deliveryPos.x, 0.004, state.deliveryPos.z);
+          if (spot) {
+            const rx = Math.max(8, BOWL_RADIUS * 1.25 * spot.scale);
+            const ry = rx * 0.45;
+            ctx.beginPath();
+            ctx.ellipse(spot.x, spot.y, rx, ry, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.85)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+          if (state.boxHover && !state.headView) {
+            const hp = project3D(state.boxHover.x, 0.004, state.boxHover.z);
+            if (hp) {
+              const rx = Math.max(6, BOWL_RADIUS * 1.05 * hp.scale);
+              const ry = rx * 0.45;
+              ctx.beginPath();
+              ctx.ellipse(hp.x, hp.y, rx, ry, 0, 0, Math.PI * 2);
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+              ctx.setLineDash([4, 3]);
+              ctx.lineWidth = 1.8;
+              ctx.stroke();
+              ctx.setLineDash([]);
+            }
+          }
+        }
+
+        // 4. 3-Sided U-Shaped Ditch Fender (wraps back, left, and right of the ditch)
+        {
+          const FENDER_H = 0.24;
+          const FENDER_T = 0.22;
+
+          // Backboard front wall
+          drawQuad3D(
+            { x: -RINK_HALF_W, y: 0, z: RINK_LENGTH },
+            { x: RINK_HALF_W, y: 0, z: RINK_LENGTH },
+            { x: RINK_HALF_W, y: FENDER_H, z: RINK_LENGTH },
+            { x: -RINK_HALF_W, y: FENDER_H, z: RINK_LENGTH },
+            '#633b1f',
+            '#452611',
+            1
+          );
+          // Left ditch wing inner wall
+          drawQuad3D(
+            { x: -RINK_HALF_W, y: 0, z: DITCH_Z },
+            { x: -RINK_HALF_W, y: 0, z: RINK_LENGTH },
+            { x: -RINK_HALF_W, y: FENDER_H, z: RINK_LENGTH },
+            { x: -RINK_HALF_W, y: FENDER_H, z: DITCH_Z },
+            '#6b4022',
+            '#452611',
+            1
+          );
+          // Right ditch wing inner wall
+          drawQuad3D(
+            { x: RINK_HALF_W, y: 0, z: DITCH_Z },
+            { x: RINK_HALF_W, y: 0, z: RINK_LENGTH },
+            { x: RINK_HALF_W, y: FENDER_H, z: RINK_LENGTH },
+            { x: RINK_HALF_W, y: FENDER_H, z: DITCH_Z },
+            '#6b4022',
+            '#452611',
+            1
+          );
+          // Left wing front end cap
+          drawQuad3D(
+            { x: -RINK_HALF_W - FENDER_T, y: 0, z: DITCH_Z },
+            { x: -RINK_HALF_W, y: 0, z: DITCH_Z },
+            { x: -RINK_HALF_W, y: FENDER_H, z: DITCH_Z },
+            { x: -RINK_HALF_W - FENDER_T, y: FENDER_H, z: DITCH_Z },
+            '#543118',
+            '#3b200f',
+            1
+          );
+          // Right wing front end cap
+          drawQuad3D(
+            { x: RINK_HALF_W, y: 0, z: DITCH_Z },
+            { x: RINK_HALF_W + FENDER_T, y: 0, z: DITCH_Z },
+            { x: RINK_HALF_W + FENDER_T, y: FENDER_H, z: DITCH_Z },
+            { x: RINK_HALF_W, y: FENDER_H, z: DITCH_Z },
+            '#543118',
+            '#3b200f',
+            1
+          );
+          // Continuous U-shaped top timber rail
+          const uTopPts = [
+            project3D(-RINK_HALF_W - FENDER_T, FENDER_H, DITCH_Z),
+            project3D(-RINK_HALF_W, FENDER_H, DITCH_Z),
+            project3D(-RINK_HALF_W, FENDER_H, RINK_LENGTH),
+            project3D(RINK_HALF_W, FENDER_H, RINK_LENGTH),
+            project3D(RINK_HALF_W, FENDER_H, DITCH_Z),
+            project3D(RINK_HALF_W + FENDER_T, FENDER_H, DITCH_Z),
+            project3D(RINK_HALF_W + FENDER_T, FENDER_H, RINK_LENGTH + FENDER_T),
+            project3D(-RINK_HALF_W - FENDER_T, FENDER_H, RINK_LENGTH + FENDER_T)
+          ];
+          if (uTopPts.every(Boolean)) {
+            ctx.beginPath();
+            ctx.moveTo(uTopPts[0].x, uTopPts[0].y);
+            for (let i = 1; i < uTopPts.length; i++) {
+              ctx.lineTo(uTopPts[i].x, uTopPts[i].y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = '#7c4a25';
+            ctx.fill();
+            ctx.strokeStyle = '#452611';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+
+        // 5. Depth-Sorted 3D Objects (Center Block, Jack, Settled Bowls, Active Bowl)
+        const renderables = [];
+
+        renderables.push({
+          z: BLOCK_Z,
+          draw: () => drawCenterBlock()
+        });
+
+        // Solid Matte Yellow Jack
+        if (state.jack.active) {
+          renderables.push({
+            z: state.jack.z,
+            draw: () => drawJack(state.jack.x, state.jack.z)
+          });
+        }
+
+        // Settled & Moving Bowls (glossy renderer + fading motion trails)
+        const nowMs = performance.now();
+        for (const b of state.bowls) {
+          if (b.trail && b.trail.length && !b.rolling && b.vx === 0 && b.vz === 0) {
+            b.trail.splice(0, 2); // Fade trail out once the bowl stops
+          }
+          if (!b.dead) drawBowlTrail(b);
+        }
+
+        for (const b of state.bowls) {
+          if (b.dead) continue;
+          renderables.push({
+            z: b.z,
+            draw: () => drawBowl(b)
+          });
+        }
+
+        // Active Player Bowl inside the Delivery Box
+        if (isHumanTurn()) {
+          renderables.push({
+            z: state.deliveryPos.z,
+            draw: () =>
+              drawBowl({
+                owner: state.turn,
+                x: state.deliveryPos.x,
+                z: state.deliveryPos.z,
+                hand: state.hand,
+                spin: 0
+              })
+          });
+        }
+
+        renderables.push({
+          z: 0,
+          draw: () => {
+            // Delivery-box end fender (z = -0.18 to 0.0)
+            drawQuad3D(
+              { x: -RINK_HALF_W, y: -0.005, z: -0.24 },
+              { x: RINK_HALF_W, y: -0.005, z: -0.24 },
+              { x: RINK_HALF_W, y: -0.005, z: -0.18 },
+              { x: -RINK_HALF_W, y: -0.005, z: -0.18 },
+              'rgba(0, 0, 0, 0.42)'
+            );
+            drawQuad3D(
+              { x: -RINK_HALF_W, y: 0, z: -0.18 },
+              { x: RINK_HALF_W, y: 0, z: -0.18 },
+              { x: RINK_HALF_W, y: 0.24, z: -0.18 },
+              { x: -RINK_HALF_W, y: 0.24, z: -0.18 },
+              '#543118',
+              '#3b200f',
+              1
+            );
+            drawQuad3D(
+              { x: -RINK_HALF_W, y: 0.24, z: -0.18 },
+              { x: RINK_HALF_W, y: 0.24, z: -0.18 },
+              { x: RINK_HALF_W, y: 0.24, z: 0 },
+              { x: -RINK_HALF_W, y: 0.24, z: 0 },
+              '#7c4a25',
+              '#452611',
+              1
+            );
+          }
+        });
+
+        renderables.sort((a, b) => b.z - a.z);
+        for (const item of renderables) {
+          item.draw();
+        }
+      }
+
+      // =========================================================================
+      // 7. REAL-TIME ROLLING & ELASTIC COLLISION PHYSICS
+      // =========================================================================
+      function stepRollingPhysics(dt) {
+        if (state.phase === 'HEAD_HOLD') {
+          state.headHoldTimer -= dt;
+          if (state.headHoldTimer <= 0) {
+            state.autoHeadView = false;
+            headViewBtn.classList.remove('ring-4', 'ring-yellow-300/70');
+            onBowlSettled();
+          }
+          return;
+        }
+        if (state.phase !== 'ROLLING') return;
+
+        let anyMoving = false;
+
+        // Advance active rolling bowls along their exact curved path
+        for (const b of state.bowls) {
+          if (b.dead) continue;
+
+          if (b.rolling) {
+            anyMoving = true;
+            // Gradual natural slow-down: progress follows an ease-out curve over time,
+            // so speed decays smoothly to exactly zero as the bowl reaches its resting spot
+            // (instead of stopping dead while still moving at speed).
+            b.t = (b.t || 0) + dt;
+            const tau = Math.min(1.0, b.t / b.duration);
+            b.u = 1.0 - Math.pow(1.0 - tau, ROLL_EASE_POWER);
+
+            const forwardZ = b.totalDist * b.u;
+            const newZ = b.startZ + forwardZ;
+            const newX =
+              b.startX +
+              forwardZ * b.slopeX +
+              getLateralBiasAtProgress(b.u, b.hand, b.biasStrength);
+
+            b.spin = (b.spin || 0) + Math.hypot(newX - b.x, newZ - b.z) / BOWL_RADIUS;
+            b.vx = (newX - b.x) / dt;
+            b.vz = (newZ - b.z) / dt;
+            b.x = newX;
+            b.z = newZ;
+            (b.trail || (b.trail = [])).push({ x: b.x, z: b.z });
+            if (b.trail.length > 28) b.trail.shift();
+
+            // Center block collision -> dead bowl removed
+            if (
+              Math.abs(b.z - BLOCK_Z) <= BLOCK_HALF_D + BOWL_RADIUS &&
+              Math.abs(b.x) <= BLOCK_HALF_W + BOWL_RADIUS
+            ) {
+              b.dead = true;
+              b.rolling = false;
+              b.vx = 0;
+              b.vz = 0;
+              showToast('Hit center block — Dead bowl removed!', 2200);
+              continue;
+            }
+
+            // Side fender or far ditch -> dead bowl removed
+            if (Math.abs(b.x) > RINK_HALF_W - BOWL_RADIUS * 0.3 || b.z > RINK_LENGTH - 0.1) {
+              b.dead = true;
+              b.rolling = false;
+              b.vx = 0;
+              b.vz = 0;
+              showToast('Bowl in the ditch — Removed', 2000);
+              continue;
+            }
+
+            if (b.u >= 1.0) {
+              b.rolling = false;
+              b.vx = 0;
+              b.vz = 0;
+            }
+          } else {
+            // Free inertial motion after collision knock
+            const speed = Math.hypot(b.vx, b.vz);
+            if (speed > 0.04) {
+              anyMoving = true;
+              const decel = Math.min(speed, 2.2 * dt);
+              const ratio = (speed - decel) / speed;
+              b.vx *= ratio;
+              b.vz *= ratio;
+              b.x += b.vx * dt;
+              b.z += b.vz * dt;
+              b.spin = (b.spin || 0) + (speed * dt) / BOWL_RADIUS;
+              (b.trail || (b.trail = [])).push({ x: b.x, z: b.z });
+              if (b.trail.length > 28) b.trail.shift();
+
+              if (Math.abs(b.x) > RINK_HALF_W - BOWL_RADIUS * 0.3 || b.z > RINK_LENGTH - 0.1) {
+                b.dead = true;
+                b.vx = 0;
+                b.vz = 0;
+                showToast('Knocked into the ditch — Removed', 2000);
+              }
+            } else {
+              b.vx = 0;
+              b.vz = 0;
+            }
+          }
+        }
+
+        // Update jack if knocked
+        if (state.jack.active) {
+          const jSpeed = Math.hypot(state.jack.vx, state.jack.vz);
+          if (jSpeed > 0.04) {
+            anyMoving = true;
+            const decel = Math.min(jSpeed, 2.0 * dt);
+            const ratio = (jSpeed - decel) / jSpeed;
+            state.jack.vx *= ratio;
+            state.jack.vz *= ratio;
+            state.jack.x += state.jack.vx * dt;
+            state.jack.z += state.jack.vz * dt;
+
+            if (state.jack.inDitch) {
+              // Once anchored in the ditch, keep it bounded inside the ditch until bowls stop, then return to spot
+              const maxDitchX = RINK_HALF_W - JACK_RADIUS;
+              if (Math.abs(state.jack.x) > maxDitchX) {
+                state.jack.x = Math.sign(state.jack.x) * maxDitchX;
+                state.jack.vx = -state.jack.vx * 0.35;
+              }
+              if (state.jack.z > RINK_LENGTH - 0.25) {
+                state.jack.z = RINK_LENGTH - 0.25;
+                state.jack.vz = -state.jack.vz * 0.35;
+              }
+            } else {
+              // Allow jack to be knocked off the left or right side of the mat (1st time free replay; 2nd+ gives opponent +1 pt & replays end)
+              if (Math.abs(state.jack.x) > RINK_HALF_W - JACK_RADIUS * 0.3) {
+                state.jack.active = false;
+                state.jack.vx = 0;
+                state.jack.vz = 0;
+                const nextCount = (state.turn === 'P1' ? state.p1DeadJackCount : state.p2DeadJackCount) + 1;
+                if (nextCount >= 2) {
+                  const strikerTitle = getPlayerLabel(state.turn, 'title');
+                  const oppTitle = getPlayerLabel(state.turn === 'P1' ? 'P2' : 'P1', 'title');
+                  showToast(`2nd dead jack (${strikerTitle})! ${oppTitle} +1 pt & replay end`, 2800);
+                } else {
+                  showToast('Dead jack (1st time) — Knocked off side! Replay end', 2800);
+                }
+              } else if (state.jack.z > RINK_LENGTH - 0.25) {
+                state.jack.z = RINK_LENGTH - 0.25;
+                state.jack.vz = 0;
+                state.jack.vx = 0;
+              }
+            }
+          } else {
+            state.jack.vx = 0;
+            state.jack.vz = 0;
+          }
+        }
+
+        // Elastic Bowl-to-Jack and Bowl-to-Bowl collisions
+        for (let i = 0; i < state.bowls.length; i++) {
+          const b1 = state.bowls[i];
+          if (b1.dead) continue;
+
+          // Bowl-to-Jack
+          if (state.jack.active) {
+            const dx = state.jack.x - b1.x;
+            const dz = state.jack.z - b1.z;
+            const dist = Math.hypot(dx, dz);
+            const minDist = BOWL_RADIUS + JACK_RADIUS;
+            if (dist > 0 && dist < minDist) {
+              const nx = dx / dist;
+              const nz = dz / dist;
+              const overlap = minDist - dist;
+              b1.x -= nx * overlap * 0.3;
+              b1.z -= nz * overlap * 0.3;
+              state.jack.x += nx * overlap * 0.7;
+              state.jack.z += nz * overlap * 0.7;
+
+              const rvx = b1.vx - state.jack.vx;
+              const rvz = b1.vz - state.jack.vz;
+              const velAlongNormal = rvx * nx + rvz * nz;
+              if (velAlongNormal > 0) {
+                if (velAlongNormal > 0.12) playClackSfx(velAlongNormal);
+                const impulse = velAlongNormal * 0.9;
+                state.jack.vx += nx * impulse;
+                state.jack.vz += nz * impulse;
+                b1.rolling = false;
+                b1.vx -= nx * impulse * 0.525;
+                b1.vz -= nz * impulse * 0.525;
+                anyMoving = true;
+              }
+            }
+          }
+
+          // Bowl-to-Bowl
+          for (let j = i + 1; j < state.bowls.length; j++) {
+            const b2 = state.bowls[j];
+            if (b2.dead) continue;
+            const dx = b2.x - b1.x;
+            const dz = b2.z - b1.z;
+            const dist = Math.hypot(dx, dz);
+            const minDist = BOWL_RADIUS * 2;
+            if (dist > 0 && dist < minDist) {
+              const nx = dx / dist;
+              const nz = dz / dist;
+              const overlap = (minDist - dist) * 0.5;
+              b1.x -= nx * overlap;
+              b1.z -= nz * overlap;
+              b2.x += nx * overlap;
+              b2.z += nz * overlap;
+
+              const rvx = b1.vx - b2.vx;
+              const rvz = b1.vz - b2.vz;
+              const velAlongNormal = rvx * nx + rvz * nz;
+              if (velAlongNormal > 0) {
+                if (velAlongNormal > 0.12) playClackSfx(velAlongNormal);
+                const impulse = velAlongNormal * 0.9;
+                b1.rolling = false;
+                b2.rolling = false;
+                b1.vx -= nx * impulse;
+                b1.vz -= nz * impulse;
+                b2.vx += nx * impulse;
+                b2.vz += nz * impulse;
+                anyMoving = true;
+              }
+            }
+          }
+        }
+
+        // Move to Head View 0.5s after the active bowl goes past the stick
+        const activeShot = state.bowls.find((b) => b.isActiveShot);
+        if (activeShot && !activeShot.dead && !state.pastStickTriggered && activeShot.z > BLOCK_Z + BLOCK_HALF_D) {
+          state.pastStickTriggered = true;
+          state.pastStickTimer = 0;
+        }
+        if (state.pastStickTriggered && !state.autoHeadView) {
+          state.pastStickTimer += dt;
+          if (state.pastStickTimer >= 0.5) {
+            state.autoHeadView = true;
+            headViewBtn.classList.add('ring-4', 'ring-yellow-300/70');
+          }
+        }
+
+        if (!anyMoving) {
+          if (state.jack.inDitch) {
+            const movedFromSpot =
+              Math.hypot(state.jack.x - state.jack.ditchX, state.jack.z - state.jack.ditchZ) > 0.02;
+            state.jack.x = state.jack.ditchX;
+            state.jack.z = state.jack.ditchZ;
+            state.jack.vx = 0;
+            state.jack.vz = 0;
+            state.jack.active = true;
+            // Nudge any settled bowl that stopped overlapping the anchored jack spot
+            const minSep = BOWL_RADIUS + JACK_RADIUS + 0.01;
+            for (const b of state.bowls) {
+              if (b.dead) continue;
+              const dx = b.x - state.jack.x;
+              const dz = b.z - state.jack.z;
+              const d = Math.hypot(dx, dz);
+              if (d < minSep) {
+                const nx = d > 1e-4 ? dx / d : 0;
+                const nz = d > 1e-4 ? dz / d : -1;
+                b.x = state.jack.x + nx * minSep;
+                b.z = state.jack.z + nz * minSep;
+              }
+            }
+            if (movedFromSpot) {
+              showToast('Jack returned to its ditch spot!', 2000);
+            }
+          } else if (state.jack.active && state.jack.z >= DITCH_Z) {
+            state.jack.inDitch = true;
+            state.jack.ditchX = state.jack.x;
+            state.jack.ditchZ = state.jack.z;
+            showToast('Jack in the ditch — Spot marked!', 2200);
+          }
+
+          if (activeShot) activeShot.isActiveShot = false;
+          updateLyingShotHUD();
+          if (state.autoHeadView) {
+            state.phase = 'HEAD_HOLD';
+            state.headHoldTimer = 0.5;
+          } else {
+            onBowlSettled();
+          }
+        }
+      }
+
+      function launchBowl(owner, startX, startZ, aimDeg, power, hand) {
+        playDeliverySfx(power);
+        const totalDist = getTargetDistanceForPower(power);
+        const biasStrength = getBiasStrengthForPower(power);
+        const rad = (aimDeg * Math.PI) / 180;
+
+        for (let i = 0; i < state.bowls.length; i++) {
+          state.bowls[i].isActiveShot = false;
+        }
+
+        state.headView = false;
+        state.autoHeadView = false;
+        state.pastStickTriggered = false;
+        state.pastStickTimer = 0;
+        state.headHoldTimer = 0;
+        headViewBtn.classList.remove('ring-4', 'ring-yellow-300/70');
+
+        state.bowls.push({
+          owner,
+          startX,
+          startZ,
+          x: startX,
+          z: startZ,
+          vx: 0,
+          vz: 0,
+          u: 0,
+          totalDist,
+          slopeX: Math.tan(rad),
+          biasStrength,
+          hand,
+          baseSpeed: 6.5 + power * 0.45,
+          // Ease-out roll: initial speed = baseSpeed, decaying smoothly to 0 at rest
+          t: 0,
+          duration: (ROLL_EASE_POWER * totalDist) / (6.5 + power * 0.45),
+          rolling: true,
+          dead: false,
+          isActiveShot: true
+        });
+
+        if (owner === 'P1') {
+          state.p1BowlsLeft = Math.max(0, state.p1BowlsLeft - 1);
+        } else {
+          state.p2BowlsLeft = Math.max(0, state.p2BowlsLeft - 1);
+        }
+
+        state.phase = 'ROLLING';
+        updateHUD();
+      }
+
+      // =========================================================================
+      // 8. GARY AI OPPONENT (GRANDMASTER CHESS-HEAD READING BOT) & MATCH PROGRESSION
+      // =========================================================================
+      function analyzeHeadSnapshot(bowlsArr, jackObj) {
+        const live = [];
+        for (let i = 0; i < bowlsArr.length; i++) {
+          const b = bowlsArr[i];
+          if (b.dead) continue;
+          live.push({
+            owner: b.owner,
+            x: b.x,
+            z: b.z,
+            dist: Math.hypot(b.x - jackObj.x, b.z - jackObj.z)
+          });
+        }
+        live.sort((a, b) => a.dist - b.dist);
+
+        if (live.length === 0) {
+          return { winner: null, shots: 0, p1Closest: 99, p2Closest: 99, live };
+        }
+
+        const winner = live[0].owner;
+        let shots = 0;
+        let p1Closest = 99;
+        let p2Closest = 99;
+        for (let i = 0; i < live.length; i++) {
+          const item = live[i];
+          if (item.owner === 'P1' && item.dist < p1Closest) p1Closest = item.dist;
+          if (item.owner === 'P2' && item.dist < p2Closest) p2Closest = item.dist;
+          if (item.owner === winner && i === shots) shots++;
+        }
+        return { winner, shots, p1Closest, p2Closest, live };
+      }
+
+      function simulateHeadOutcome(startX, startZ, aimDeg, power, hand) {
+        const totalDist = getTargetDistanceForPower(power);
+        const biasStrength = getBiasStrengthForPower(power);
+        const rad = (aimDeg * Math.PI) / 180;
+        const slopeX = Math.tan(rad);
+        const baseSpeed = 6.5 + power * 0.45;
+        const duration = (ROLL_EASE_POWER * totalDist) / baseSpeed;
+
+        const simBowls = [];
+        for (let i = 0; i < state.bowls.length; i++) {
+          const b = state.bowls[i];
+          if (b.dead) continue;
+          simBowls.push({
+            owner: b.owner,
+            x: b.x,
+            z: b.z,
+            vx: 0,
+            vz: 0,
+            rolling: false,
+            dead: false
+          });
+        }
+
+        const activeBowl = {
+          owner: 'P2',
+          startX,
+          startZ,
+          x: startX,
+          z: startZ,
+          vx: 0,
+          vz: 0,
+          u: 0,
+          totalDist,
+          slopeX,
+          biasStrength,
+          hand,
+          t: 0,
+          duration,
+          rolling: true,
+          dead: false
+        };
+        simBowls.push(activeBowl);
+
+        const simJack = {
+          x: state.jack.x,
+          z: state.jack.z,
+          vx: 0,
+          vz: 0,
+          active: state.jack.active,
+          inDitch: state.jack.inDitch,
+          ditchX: state.jack.ditchX,
+          ditchZ: state.jack.ditchZ
+        };
+
+        const dt = 1 / 28;
+        const maxSteps = 340;
+        for (let step = 0; step < maxSteps; step++) {
+          let anyMoving = false;
+
+          for (let i = 0; i < simBowls.length; i++) {
+            const b = simBowls[i];
+            if (b.dead) continue;
+            if (b.rolling) {
+              anyMoving = true;
+              b.t += dt;
+              const tau = Math.min(1.0, b.t / b.duration);
+              b.u = 1.0 - Math.pow(1.0 - tau, ROLL_EASE_POWER);
+              const forwardZ = b.totalDist * b.u;
+              const newZ = b.startZ + forwardZ;
+              const newX =
+                b.startX +
+                forwardZ * b.slopeX +
+                getLateralBiasAtProgress(b.u, b.hand, b.biasStrength);
+
+              b.vx = (newX - b.x) / dt;
+              b.vz = (newZ - b.z) / dt;
+              b.x = newX;
+              b.z = newZ;
+
+              if (
+                Math.abs(b.z - BLOCK_Z) <= BLOCK_HALF_D + BOWL_RADIUS &&
+                Math.abs(b.x) <= BLOCK_HALF_W + BOWL_RADIUS
+              ) {
+                b.dead = true;
+                b.rolling = false;
+                b.vx = 0;
+                b.vz = 0;
+                continue;
+              }
+              if (Math.abs(b.x) > RINK_HALF_W - BOWL_RADIUS * 0.3 || b.z > RINK_LENGTH - 0.1) {
+                b.dead = true;
+                b.rolling = false;
+                b.vx = 0;
+                b.vz = 0;
+                continue;
+              }
+              if (b.u >= 1.0) {
+                b.rolling = false;
+                b.vx = 0;
+                b.vz = 0;
+              }
+            } else {
+              const speed = Math.hypot(b.vx, b.vz);
+              if (speed > 0.04) {
+                anyMoving = true;
+                const decel = Math.min(speed, 2.2 * dt);
+                const ratio = (speed - decel) / speed;
+                b.vx *= ratio;
+                b.vz *= ratio;
+                b.x += b.vx * dt;
+                b.z += b.vz * dt;
+                if (Math.abs(b.x) > RINK_HALF_W - BOWL_RADIUS * 0.3 || b.z > RINK_LENGTH - 0.1) {
+                  b.dead = true;
+                  b.vx = 0;
+                  b.vz = 0;
+                }
+              } else {
+                b.vx = 0;
+                b.vz = 0;
+              }
+            }
+          }
+
+          if (simJack.active) {
+            const jSpeed = Math.hypot(simJack.vx, simJack.vz);
+            if (jSpeed > 0.04) {
+              anyMoving = true;
+              const decel = Math.min(jSpeed, 2.0 * dt);
+              const ratio = (jSpeed - decel) / jSpeed;
+              simJack.vx *= ratio;
+              simJack.vz *= ratio;
+              simJack.x += simJack.vx * dt;
+              simJack.z += simJack.vz * dt;
+              if (simJack.inDitch) {
+                const maxDitchX = RINK_HALF_W - JACK_RADIUS;
+                if (Math.abs(simJack.x) > maxDitchX) {
+                  simJack.x = Math.sign(simJack.x) * maxDitchX;
+                  simJack.vx = -simJack.vx * 0.35;
+                }
+                if (simJack.z > RINK_LENGTH - 0.25) {
+                  simJack.z = RINK_LENGTH - 0.25;
+                  simJack.vz = -simJack.vz * 0.35;
+                }
+              } else {
+                if (Math.abs(simJack.x) > RINK_HALF_W - JACK_RADIUS * 0.3) {
+                  simJack.active = false;
+                  simJack.vx = 0;
+                  simJack.vz = 0;
+                } else if (simJack.z > RINK_LENGTH - 0.25) {
+                  simJack.z = RINK_LENGTH - 0.25;
+                  simJack.vx = 0;
+                  simJack.vz = 0;
+                }
+              }
+            } else {
+              simJack.vx = 0;
+              simJack.vz = 0;
+            }
+          }
+
+          for (let i = 0; i < simBowls.length; i++) {
+            const b1 = simBowls[i];
+            if (b1.dead) continue;
+
+            if (simJack.active) {
+              const dx = simJack.x - b1.x;
+              const dz = simJack.z - b1.z;
+              const dist = Math.hypot(dx, dz);
+              const minDist = BOWL_RADIUS + JACK_RADIUS;
+              if (dist > 0 && dist < minDist) {
+                const nx = dx / dist;
+                const nz = dz / dist;
+                const overlap = minDist - dist;
+                b1.x -= nx * overlap * 0.3;
+                b1.z -= nz * overlap * 0.3;
+                simJack.x += nx * overlap * 0.7;
+                simJack.z += nz * overlap * 0.7;
+                const rvx = b1.vx - simJack.vx;
+                const rvz = b1.vz - simJack.vz;
+                const velAlongNormal = rvx * nx + rvz * nz;
+                if (velAlongNormal > 0) {
+                  const impulse = velAlongNormal * 0.9;
+                  simJack.vx += nx * impulse;
+                  simJack.vz += nz * impulse;
+                  b1.rolling = false;
+                  b1.vx -= nx * impulse * 0.525;
+                  b1.vz -= nz * impulse * 0.525;
+                  anyMoving = true;
+                }
+              }
+            }
+
+            for (let j = i + 1; j < simBowls.length; j++) {
+              const b2 = simBowls[j];
+              if (b2.dead) continue;
+              const dx = b2.x - b1.x;
+              const dz = b2.z - b1.z;
+              const dist = Math.hypot(dx, dz);
+              const minDist = BOWL_RADIUS * 2;
+              if (dist > 0 && dist < minDist) {
+                const nx = dx / dist;
+                const nz = dz / dist;
+                const overlap = (minDist - dist) * 0.5;
+                b1.x -= nx * overlap;
+                b1.z -= nz * overlap;
+                b2.x += nx * overlap;
+                b2.z += nz * overlap;
+                const rvx = b1.vx - b2.vx;
+                const rvz = b1.vz - b2.vz;
+                const velAlongNormal = rvx * nx + rvz * nz;
+                if (velAlongNormal > 0) {
+                  const impulse = velAlongNormal * 0.9;
+                  b1.rolling = false;
+                  b2.rolling = false;
+                  b1.vx -= nx * impulse;
+                  b1.vz -= nz * impulse;
+                  b2.vx += nx * impulse;
+                  b2.vz += nz * impulse;
+                  anyMoving = true;
+                }
+              }
+            }
+          }
+
+          if (!anyMoving) break;
+        }
+
+        if (simJack.inDitch) {
+          simJack.x = simJack.ditchX;
+          simJack.z = simJack.ditchZ;
+          simJack.vx = 0;
+          simJack.vz = 0;
+          simJack.active = true;
+          const minSep = BOWL_RADIUS + JACK_RADIUS + 0.01;
+          for (let i = 0; i < simBowls.length; i++) {
+            const b = simBowls[i];
+            if (b.dead) continue;
+            const dx = b.x - simJack.x;
+            const dz = b.z - simJack.z;
+            const d = Math.hypot(dx, dz);
+            if (d < minSep) {
+              const nx = d > 1e-4 ? dx / d : 0;
+              const nz = d > 1e-4 ? dz / d : -1;
+              b.x = simJack.x + nx * minSep;
+              b.z = simJack.z + nz * minSep;
+            }
+          }
+        }
+
+        return { bowls: simBowls, jack: simJack, activeDead: activeBowl.dead, activeBowl };
+      }
+
+      function evaluateHeadState(outcome, preHead) {
+        if (!outcome.jack.active) {
+          const aiWouldPenalize = state.p2DeadJackCount >= 1;
+          if (preHead.winner === 'P2') {
+            return aiWouldPenalize ? -220 * preHead.shots - 160 : -220 * preHead.shots - 40;
+          }
+          if (aiWouldPenalize) {
+            if (preHead.winner === 'P1' && preHead.shots >= 3) {
+              return 15;
+            }
+            return -135;
+          }
+          if (preHead.winner === 'P1') {
+            return preHead.shots >= 2 ? 35 * preHead.shots : -25;
+          }
+          return -35;
+        }
+        const post = analyzeHeadSnapshot(outcome.bowls, outcome.jack);
+        const matchLead = state.p2Score - state.p1Score;
+        const isLastEnd = state.end >= MAX_ENDS;
+        const playerBowlsRem = state.p1BowlsLeft;
+        const aiBowlsAfterThis = Math.max(0, state.p2BowlsLeft - 1);
+
+        let score = 0;
+
+        // 1. Primary objective: Exact shot count in the head (+ for Gary, - for Player)
+        const shotScore = post.winner === 'P2' ? post.shots : post.winner === 'P1' ? -post.shots : 0;
+        const urgencyMult = isLastEnd && matchLead < 0 ? 155 : 120;
+        score += shotScore * urgencyMult;
+
+        // 2. Dead active bowl penalty (avoid wasting a bowl in the block or ditch unless it converted the head)
+        if (outcome.activeDead) {
+          score -= preHead.winner === 'P1' ? 28 : 55;
+        }
+
+        // 3. Proximity & Positional Head Strength
+        if (post.p2Closest < 90) {
+          // Heavily reward hugging the jack (under 0.35m makes it brutal to beat)
+          score += Math.max(0, 4.5 - post.p2Closest) * 14.0;
+          if (post.p2Closest < 0.32) score += 22.0;
+          else if (post.p2Closest < 0.60) score += 10.0;
+        }
+        if (post.p1Closest < 90) {
+          // Penalize opponent bowls dangerously close to jack
+          score -= Math.max(0, 2.5 - post.p1Closest) * 9.0;
+        }
+
+        // 4. Multi-bowl head control, Split Head & Back-Bowl Insurance
+        let hasLeft = false;
+        let hasRight = false;
+        let backBowlBonus = 0;
+        let guardBonus = 0;
+        let clusterPenalty = 0;
+
+        const p2Live = [];
+        for (let i = 0; i < post.live.length; i++) {
+          const item = post.live[i];
+          if (item.owner !== 'P2') continue;
+          p2Live.push(item);
+
+          // Split-head bonus: having bowls on both sides of the jack prevents 1-shot opponent clear-outs
+          if (item.dist < 1.35) {
+            if (item.x < outcome.jack.x - 0.14) hasLeft = true;
+            if (item.x > outcome.jack.x + 0.14) hasRight = true;
+          }
+
+          // Back-bowl insurance: sits 0.3m to 1.4m behind the jack near center line
+          const dzBack = item.z - outcome.jack.z;
+          const dxCenter = Math.abs(item.x - outcome.jack.x);
+          if (dzBack >= 0.25 && dzBack <= 1.55 && dxCenter <= 0.75) {
+            backBowlBonus += 11.0 - dzBack * 3.0;
+          }
+
+          // Front Guard / Blocker: when already holding shot and player still has bowls, blocking draw channels
+          if (post.winner === 'P2' && playerBowlsRem > 0) {
+            const dzFront = outcome.jack.z - item.z;
+            if (dzFront >= 0.9 && dzFront <= 3.6 && Math.abs(item.x - outcome.jack.x) <= 1.15) {
+              guardBonus += 7.5;
+            }
+          }
+
+          // Count all close counters inside 1.5m
+          if (item.dist < 1.5) {
+            score += (1.5 - item.dist) * 6.5;
+          }
+        }
+
+        // Avoid tight clustering of own bowls when player still has firing bowls left
+        if (playerBowlsRem > 0) {
+          for (let i = 0; i < p2Live.length; i++) {
+            for (let j = i + 1; j < p2Live.length; j++) {
+              const d = Math.hypot(p2Live[i].x - p2Live[j].x, p2Live[i].z - p2Live[j].z);
+              if (d < 0.42 && p2Live[i].dist < 1.1) {
+                clusterPenalty += 7.0;
+              }
+            }
+          }
+        }
+
+        if (hasLeft && hasRight && playerBowlsRem > 0) {
+          score += 14.0;
+        }
+        score += Math.min(18.0, backBowlBonus) + Math.min(14.0, guardBonus) - clusterPenalty;
+
+        // 5. End-game chess posture
+        if (isLastEnd && matchLead > 0 && aiBowlsAfterThis === 0) {
+          // If Gary is ahead in match score and holds enough shots to win, lock it down!
+          if (matchLead + shotScore > 0) score += 25.0;
+        }
+
+        return score;
+      }
+
+      function computeGrandmasterShot() {
+        const preHead = analyzeHeadSnapshot(state.bowls, state.jack);
+        const liveTargets = state.bowls.filter((b) => !b.dead).map((b) => ({ x: b.x, z: b.z }));
+        liveTargets.push({ x: state.jack.x, z: state.jack.z });
+
+        const candidates = [];
+        const startXs = [-1.45, -0.75, 0.0, 0.75, 1.45];
+        const startZs = [2.4];
+        const hands = ['FH', 'BH'];
+
+        // Determine tactical power ranges: draws always searched; firing/weight searched aggressively if behind in head
+        const trailingInHead = preHead.winner === 'P1';
+        const powers = trailingInHead
+          ? [8.0, 9.0, 9.8, 10.5, 11.2, 12.0, 13.0, 14.2, 15.5, 17.0, 18.5]
+          : [8.0, 8.8, 9.6, 10.3, 11.0, 11.8, 12.6, 13.8, 15.8];
+
+        // Stage 1: Fast trajectory screening + physics evaluation for relevant lines
+        for (const hand of hands) {
+          const aimMin = hand === 'FH' ? -3.0 : -24.0;
+          const aimMax = hand === 'FH' ? 24.0 : 3.0;
+
+          for (const sx of startXs) {
+            for (const sz of startZs) {
+              for (let aim = aimMin; aim <= aimMax; aim += 1.5) {
+                for (const pwr of powers) {
+                  const sim = simulateTrajectory(sx, sz, aim, pwr, hand);
+                  if (sim.hitBlock) continue;
+                  // Skip firing shots that miss all targets by miles and go straight in the ditch
+                  let minTargetDist = 99;
+                  for (let p = 0; p < sim.points.length; p += 2) {
+                    const pt = sim.points[p];
+                    for (let t = 0; t < liveTargets.length; t++) {
+                      const d = Math.hypot(pt.x - liveTargets[t].x, pt.z - liveTargets[t].z);
+                      if (d < minTargetDist) minTargetDist = d;
+                    }
+                  }
+                  if (sim.outOfBounds && minTargetDist > 0.42) continue;
+                  if (minTargetDist > 2.6) continue;
+
+                  const outcome = simulateHeadOutcome(sx, sz, aim, pwr, hand);
+                  const evalScore = evaluateHeadState(outcome, preHead);
+                  candidates.push({ x: sx, z: sz, aim, power: pwr, hand, evalScore });
+                }
+              }
+            }
+          }
+        }
+
+        candidates.sort((a, b) => b.evalScore - a.evalScore);
+
+        // Pick up to 4 diverse top tactical seeds for Stage 2 refinement
+        const seeds = [];
+        for (let i = 0; i < candidates.length && seeds.length < 4; i++) {
+          const c = candidates[i];
+          const tooClose = seeds.some(
+            (s) =>
+              s.hand === c.hand &&
+              Math.abs(s.x - c.x) < 0.4 &&
+              Math.abs(s.aim - c.aim) < 1.2 &&
+              Math.abs(s.power - c.power) < 0.8
+          );
+          if (!tooClose) seeds.push(c);
+        }
+
+        let bestShot = seeds[0] || { x: 0.65, z: 2.4, aim: 4.5, power: 10.5, hand: 'FH', evalScore: -999 };
+
+        // Stage 2: Moderate local refinement (challenging but beatable)
+        for (const seed of seeds) {
+          for (let dAim = -0.8; dAim <= 0.81; dAim += 0.4) {
+            const aim = Math.max(-24, Math.min(24, seed.aim + dAim));
+            for (let dPwr = -0.45; dPwr <= 0.46; dPwr += 0.3) {
+              const pwr = Math.max(5.5, Math.min(19.5, seed.power + dPwr));
+              const outcome = simulateHeadOutcome(seed.x, seed.z, aim, pwr, seed.hand);
+              const evalScore = evaluateHeadState(outcome, preHead);
+              if (evalScore > bestShot.evalScore) {
+                bestShot = { x: seed.x, z: seed.z, aim, power: pwr, hand: seed.hand, evalScore };
+              }
+            }
+          }
+        }
+
+        return { bestShot, preHead };
+      }
+
+      function triggerAITurn() {
+        state.phase = 'AI_THINKING';
+        updateHUD();
+        showToast('Gary Mcnabb is reading the head...', 1400);
+
+        setTimeout(() => {
+          if (state.phase !== 'AI_THINKING') return;
+
+          const { bestShot, preHead } = computeGrandmasterShot();
+
+          // Realistic club-player delivery variance (beatable, not surgical)
+          const jitterAim = (Math.random() - 0.5) * 1.6;
+          const jitterPower = (Math.random() - 0.5) * 0.85;
+          const finalPower = Math.max(5.5, Math.min(19.5, bestShot.power + jitterPower));
+
+          if (finalPower >= 15.2 && preHead.winner === 'P1') {
+            showToast('Gary Mcnabb fires at the head!', 1600);
+          }
+
+          launchBowl(
+            'P2',
+            bestShot.x,
+            bestShot.z,
+            Math.max(-24, Math.min(24, bestShot.aim + jitterAim)),
+            finalPower,
+            bestShot.hand
+          );
+        }, 900);
+      }
+
+      function onBowlSettled() {
+        if (!state.jack.active) {
+          const strikerName = getPlayerLabel(state.turn, 'title');
+          const oppOwner = state.turn === 'P1' ? 'P2' : 'P1';
+          const oppName = getPlayerLabel(oppOwner, 'title');
+          if (state.turn === 'P1') {
+            state.p1DeadJackCount += 1;
+            if (state.p1DeadJackCount >= 2) {
+              state.p2Score += 1;
+              updateHUD();
+              setupNewEnd(state.jackLength);
+              showToast(`2nd dead jack by ${strikerName}! ${oppName} +1 pt • End ${state.end} restarted`, 3200);
+            } else {
+              setupNewEnd(state.jackLength);
+              showToast(`Dead jack (1st time) — End ${state.end} restarted (${state.jackLength} Jack)`, 2800);
+            }
+          } else {
+            state.p2DeadJackCount += 1;
+            if (state.p2DeadJackCount >= 2) {
+              state.p1Score += 1;
+              updateHUD();
+              setupNewEnd(state.jackLength);
+              showToast(`2nd dead jack by ${strikerName}! ${oppName} +1 pt • End ${state.end} restarted`, 3200);
+            } else {
+              setupNewEnd(state.jackLength);
+              showToast(`${strikerName} dead jack (1st time) — End ${state.end} restarted (${state.jackLength} Jack)`, 2800);
+            }
+          }
+          return;
+        }
+
+        if (state.p1BowlsLeft === 0 && state.p2BowlsLeft === 0) {
+          scoreCurrentEnd();
+          return;
+        }
+
+        if (state.turn === 'P1') {
+          if (state.p2BowlsLeft > 0) {
+            state.turn = 'P2';
+            if (state.gameMode === 'ai') {
+              triggerAITurn();
+            } else {
+              state.phase = 'AIMING';
+              updateHUD();
+              showToast("Player 2's Turn (Blue)", 1800);
+            }
+          } else {
+            state.turn = 'P1';
+            state.phase = 'AIMING';
+            updateHUD();
+            if (state.gameMode === '2p') showToast("Player 1's Turn (Red)", 1800);
+          }
+        } else {
+          if (state.p1BowlsLeft > 0) {
+            state.turn = 'P1';
+            state.phase = 'AIMING';
+            updateHUD();
+            if (state.gameMode === '2p') showToast("Player 1's Turn (Red)", 1800);
+          } else {
+            state.turn = 'P2';
+            if (state.gameMode === 'ai') {
+              triggerAITurn();
+            } else {
+              state.phase = 'AIMING';
+              updateHUD();
+              showToast("Player 2's Turn (Blue)", 1800);
+            }
+          }
+        }
+      }
+
+      function scoreCurrentEnd() {
+        state.phase = 'SUMMARY';
+        const liveBowls = state.bowls.filter((b) => !b.dead);
+        const summaryP1Label = document.getElementById('summary-p1-label');
+        const summaryP2Label = document.getElementById('summary-p2-label');
+        if (summaryP1Label) summaryP1Label.textContent = getPlayerLabel('P1', 'scoreboard');
+        if (summaryP2Label) summaryP2Label.textContent = getPlayerLabel('P2', 'scoreboard');
+
+        if (liveBowls.length === 0) {
+          document.getElementById('summary-end-label').textContent = `END ${state.end} OF ${MAX_ENDS} COMPLETE`;
+          document.getElementById('summary-headline').textContent = 'BLANK END — 0 SHOTS';
+          document.getElementById('summary-subtext').textContent = 'No live bowls remained on the mat.';
+          document.getElementById('summary-p1-total').textContent = state.p1Score;
+          document.getElementById('summary-p2-total').textContent = state.p2Score;
+          const continueBtn = document.getElementById('summary-continue-btn');
+          continueBtn.textContent = state.end >= MAX_ENDS ? 'PLAY AGAIN' : 'CONTINUE';
+          summaryModal.classList.remove('hidden');
+          summaryModal.classList.add('flex');
+          return;
+        }
+
+        const withDist = liveBowls
+          .map((b) => ({
+            owner: b.owner,
+            dist: Math.hypot(b.x - state.jack.x, b.z - state.jack.z)
+          }))
+          .sort((a, b) => a.dist - b.dist);
+
+        const winner = withDist[0].owner;
+        const closestDist = withDist[0].dist;
+        let shots = 0;
+        for (const item of withDist) {
+          if (item.owner === winner) {
+            shots++;
+          } else {
+            break;
+          }
+        }
+
+        if (winner === 'P1') {
+          state.p1Score += shots;
+          state.matOwner = 'P1';
+        } else {
+          state.p2Score += shots;
+          state.matOwner = 'P2';
+        }
+
+        updateHUD();
+
+        document.getElementById('summary-end-label').textContent = `END ${state.end} OF ${MAX_ENDS} COMPLETE`;
+        document.getElementById('summary-headline').textContent =
+          `${getPlayerLabel(winner, 'scoreboard')} SCORED ${shots} SHOT${shots > 1 ? 'S' : ''}`;
+        document.getElementById('summary-subtext').textContent =
+          `Closest ${winner === 'P1' ? 'red' : 'blue'} bowl finished ${closestDist.toFixed(2)}m from the jack.`;
+        document.getElementById('summary-p1-total').textContent = state.p1Score;
+        document.getElementById('summary-p2-total').textContent = state.p2Score;
+
+        const continueBtn = document.getElementById('summary-continue-btn');
+        continueBtn.textContent = state.end >= MAX_ENDS ? 'PLAY AGAIN' : 'CONTINUE';
+
+        summaryModal.classList.remove('hidden');
+        summaryModal.classList.add('flex');
+      }
+
+      function setupNewEnd(jackLengthChoice) {
+        state.jackLength = jackLengthChoice;
+        state.bowls = [];
+        state.p1BowlsLeft = BOWLS_PER_PLAYER;
+        state.p2BowlsLeft = BOWLS_PER_PLAYER;
+        state.deliveryPos = { x: 0.0, z: 3.1 };
+        state.headView = false;
+        state.autoHeadView = false;
+        state.pastStickTriggered = false;
+        state.pastStickTimer = 0;
+        state.headHoldTimer = 0;
+        headViewBtn.classList.remove('ring-4', 'ring-yellow-300/70');
+        state.jack = {
+          x: 0.0,
+          z: JACK_DISTANCES[jackLengthChoice],
+          vx: 0,
+          vz: 0,
+          active: true,
+          inDitch: false,
+          ditchX: 0,
+          ditchZ: 0
+        };
+
+        if (state.matOwner === 'P1') {
+          state.turn = 'P1';
+          state.phase = 'AIMING';
+          updateHUD();
+          const p1Hint = state.gameMode === '2p' ? 'Player 1 (Red) — ' : '';
+          showToast(`End ${state.end} (${jackLengthChoice} Jack) — ${p1Hint}Tap white box to place bowl`, 2600);
+        } else if (state.gameMode === '2p') {
+          state.turn = 'P2';
+          state.phase = 'AIMING';
+          updateHUD();
+          showToast(`End ${state.end} (${jackLengthChoice} Jack) — Player 2 (Blue) holds the mat`, 2600);
+        } else {
+          state.turn = 'P2';
+          updateHUD();
+          showToast(`Gary Mcnabb chose ${jackLengthChoice} jack & leads off`, 2600);
+          triggerAITurn();
+        }
+      }
+
+      // =========================================================================
+      // 9. UI & INTERACTION HANDLERS
+      // =========================================================================
+      function updateTurnColorTheme() {
+        const isP2Human = state.gameMode === '2p' && state.turn === 'P2';
+        const activeBtnCls = isP2Human
+          ? 'px-5 py-3.5 rounded-2xl text-sm sm:text-base font-black tracking-wide transition-all bg-blue-600 text-white shadow cursor-pointer select-none'
+          : 'px-5 py-3.5 rounded-2xl text-sm sm:text-base font-black tracking-wide transition-all bg-red-600 text-white shadow cursor-pointer select-none';
+        const idleBtnCls =
+          'px-5 py-3.5 rounded-2xl text-sm sm:text-base font-black tracking-wide transition-all text-slate-300 hover:text-white cursor-pointer select-none';
+
+        btnFh.className = state.hand === 'FH' ? activeBtnCls : idleBtnCls;
+        btnBh.className = state.hand === 'BH' ? activeBtnCls : idleBtnCls;
+
+        if (bowlsBadge) {
+          bowlsBadge.className = isP2Human
+            ? 'absolute -top-1.5 -right-1.5 w-8 h-8 rounded-full bg-blue-600 border-2 border-slate-900 text-white text-base font-black flex items-center justify-center shadow-lg'
+            : 'absolute -top-1.5 -right-1.5 w-8 h-8 rounded-full bg-red-600 border-2 border-slate-900 text-white text-base font-black flex items-center justify-center shadow-lg';
+        }
+      }
+
+      function updateLyingShotHUD() {
+        const badge = document.getElementById('lying-shot-badge');
+        const dot = document.getElementById('lying-shot-dot');
+        const text = document.getElementById('lying-shot-text');
+        const label = document.getElementById('lying-shot-label');
+        if (!badge || !dot || !text) return;
+
+        const liveBowls = state.bowls.filter((b) => !b.dead);
+        if (liveBowls.length === 0 || !state.jack.active) {
+          badge.className = 'pointer-events-auto fixed bg-slate-900/92 backdrop-blur-md border border-slate-700/80 rounded-2xl px-3.5 py-2 shadow-2xl flex items-center gap-2.5 z-10 transition-all';
+          dot.className = 'inline-block w-3.5 h-3.5 rounded-full bg-slate-600 border border-slate-500';
+          if (label) label.className = 'text-[10px] font-black uppercase tracking-wider text-slate-400 mb-0.5';
+          text.textContent = 'NONE';
+          text.className = 'text-xs sm:text-sm font-black text-slate-400 whitespace-nowrap';
+          return;
+        }
+
+        const withDist = liveBowls
+          .map((b) => ({
+            owner: b.owner,
+            dist: Math.hypot(b.x - state.jack.x, b.z - state.jack.z)
+          }))
+          .sort((a, b) => a.dist - b.dist);
+
+        const winner = withDist[0].owner;
+        let shots = 0;
+        for (const item of withDist) {
+          if (item.owner === winner) shots++;
+          else break;
+        }
+
+        const countSuffix = shots > 1 ? ` (${shots})` : '';
+        if (winner === 'P1') {
+          // Solid Red when Red bowl has shots
+          badge.className = 'pointer-events-auto fixed bg-red-600 border-2 border-red-400 rounded-2xl px-3.5 py-2 shadow-[0_0_20px_rgba(239,68,68,0.75)] flex items-center gap-2.5 z-10 transition-all text-white';
+          dot.className = 'inline-block w-3.5 h-3.5 rounded-full bg-white shadow-md border-2 border-red-200';
+          if (label) label.className = 'text-[10px] font-black uppercase tracking-wider text-red-100 mb-0.5';
+          text.textContent = `${getPlayerLabel('P1', 'shot')}${countSuffix}`;
+          text.className = 'text-xs sm:text-sm font-black text-white whitespace-nowrap tracking-wide';
+        } else {
+          // Solid Blue when Blue bowl has shots
+          badge.className = 'pointer-events-auto fixed bg-blue-600 border-2 border-blue-400 rounded-2xl px-3.5 py-2 shadow-[0_0_20px_rgba(59,130,246,0.75)] flex items-center gap-2.5 z-10 transition-all text-white';
+          dot.className = 'inline-block w-3.5 h-3.5 rounded-full bg-white shadow-md border-2 border-blue-200';
+          if (label) label.className = 'text-[10px] font-black uppercase tracking-wider text-blue-100 mb-0.5';
+          text.textContent = `${getPlayerLabel('P2', 'shot')}${countSuffix}`;
+          text.className = 'text-xs sm:text-sm font-black text-white whitespace-nowrap tracking-wide';
+        }
+      }
+
+      function updateHUD() {
+        hudEnd.textContent = `END ${state.end} / ${MAX_ENDS}`;
+        if (hudP1Label) hudP1Label.textContent = getPlayerLabel('P1', 'scoreboard');
+        if (hudP2Label) hudP2Label.textContent = getPlayerLabel('P2', 'scoreboard');
+        hudP1Score.textContent = state.p1Score;
+        hudP2Score.textContent = state.p2Score;
+
+        const showP2Bowls = state.gameMode === '2p' && state.turn === 'P2';
+        if (bowlsBadge) bowlsBadge.textContent = showP2Bowls ? state.p2BowlsLeft : state.p1BowlsLeft;
+
+        updateTurnColorTheme();
+        updateLyingShotHUD();
+        updateSwipeReadout();
+      }
+
+      // Click, tap, or drag inside the white delivery box to place the bowl right where you click
+      function getCanvasPoint(e) {
+        const rect = canvas.getBoundingClientRect();
+        const sx = (e.clientX - rect.left) * (viewW / Math.max(1, rect.width));
+        const sy = (e.clientY - rect.top) * (viewH / Math.max(1, rect.height));
+        return screenToMatFloor(sx, sy);
+      }
+
+      function isInsideDeliveryBox(floorPt, margin = 0.0) {
+        if (!floorPt) return false;
+        return (
+          floorPt.z >= BOX_Z_MIN - margin &&
+          floorPt.z <= BOX_Z_MAX + margin &&
+          Math.abs(floorPt.x) <= BOX_HALF_W + margin
+        );
+      }
+
+      function clampToDeliveryBox(floorPt) {
+        const edgePad = 0.08;
+        return {
+          x: Math.max(-BOX_HALF_W + edgePad, Math.min(BOX_HALF_W - edgePad, floorPt.x)),
+          z: Math.max(BOX_Z_MIN + edgePad, Math.min(BOX_Z_MAX - edgePad, floorPt.z))
+        };
+      }
+
+      // =========================================================================
+      // SWIPE-TO-BOWL POINTER LISTENERS
+      //   pointerdown  on / near the bowl -> begin swipe (anywhere else in the box -> reposition bowl)
+      //   pointermove  -> live aim + power fed into the white trajectory line
+      //   pointerup    -> final angle + velocity -> launchBowl (respects FOREHAND / BACKHAND bias)
+      // =========================================================================
+      canvas.style.touchAction = 'none'; // stop the browser scrolling / zooming while swiping
+
+      // Pointer position in the same screen space used by project3D / screenToMatFloor
+      function getCanvasScreenPoint(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: (e.clientX - rect.left) * (viewW / Math.max(1, rect.width)),
+          y: (e.clientY - rect.top) * (viewH / Math.max(1, rect.height))
+        };
+      }
+
+      function getBowlScreenPoint() {
+        return project3D(state.deliveryPos.x, BOWL_RADIUS, state.deliveryPos.z);
+      }
+
+      function isNearBowl(pt) {
+        const bp = getBowlScreenPoint();
+        if (!bp) return false;
+        const grabR = Math.max(SWIPE_GRAB_RADIUS_PX, BOWL_RADIUS * bp.scale * 2.4);
+        return Math.hypot(pt.x - bp.x, pt.y - bp.y) <= grabR;
+      }
+
+      canvas.addEventListener('pointerdown', (e) => {
+        if (!isHumanTurn() || state.headView || swipe.active) return;
+        const sp = getCanvasScreenPoint(e);
+
+        // 1) Swipe starts on the bowl -> begin a delivery gesture
+        if (isNearBowl(sp)) {
+          const now = performance.now();
+          swipe.active = true;
+          swipe.pointerId = e.pointerId;
+          swipe.startX = swipe.curX = sp.x;
+          swipe.startY = swipe.curY = sp.y;
+          swipe.startT = swipe.curT = now;
+          swipe.valid = false;
+          state.boxHover = null;
+          if (canvas.setPointerCapture) {
+            try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+          }
+          canvas.style.cursor = 'grabbing';
+          updateSwipeReadout();
+          e.preventDefault();
+          return;
+        }
+
+        // 2) Otherwise: tap / drag inside the white delivery box to reposition the bowl (unless placement is locked)
+        if (state.placementLocked) return;
+        const floorPt = screenToMatFloor(sp.x, sp.y);
+        if (!isInsideDeliveryBox(floorPt, 0.35)) return;
+
+        isPlacingBowl = true;
+        if (canvas.setPointerCapture) {
+          try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+        }
+        const clamped = clampToDeliveryBox(floorPt);
+        state.deliveryPos.x = clamped.x;
+        state.deliveryPos.z = clamped.z;
+        state.boxHover = clamped;
+      });
+
+      canvas.addEventListener('pointermove', (e) => {
+        // Live swipe: update aim + power so the white trajectory line previews the shot in real time
+        if (swipe.active) {
+          if (e.pointerId !== swipe.pointerId) return;
+          const sp = getCanvasScreenPoint(e);
+          swipe.curX = sp.x;
+          swipe.curY = sp.y;
+          swipe.curT = performance.now();
+          updateSwipePreview(swipe.curT);
+          return;
+        }
+
+        if (!isHumanTurn() || state.headView) {
+          state.boxHover = null;
+          canvas.style.cursor = 'default';
+          return;
+        }
+        const sp = getCanvasScreenPoint(e);
+        const floorPt = screenToMatFloor(sp.x, sp.y);
+        if (isPlacingBowl && floorPt && !state.placementLocked) {
+          const clamped = clampToDeliveryBox(floorPt);
+          state.deliveryPos.x = clamped.x;
+          state.deliveryPos.z = clamped.z;
+          state.boxHover = clamped;
+          canvas.style.cursor = 'grabbing';
+          return;
+        }
+        if (isNearBowl(sp)) {
+          state.boxHover = null;
+          canvas.style.cursor = 'grab';
+        } else if (!state.placementLocked && isInsideDeliveryBox(floorPt, 0.15)) {
+          state.boxHover = clampToDeliveryBox(floorPt);
+          canvas.style.cursor = 'crosshair';
+        } else {
+          state.boxHover = null;
+          canvas.style.cursor = 'default';
+        }
+      });
+
+      function releaseSwipePointer(e) {
+        if (e && canvas.releasePointerCapture) {
+          try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+        }
+      }
+
+      canvas.addEventListener('pointerup', (e) => {
+        if (swipe.active) {
+          if (e.pointerId !== swipe.pointerId) return;
+          const sp = getCanvasScreenPoint(e);
+          const elapsedMs = performance.now() - swipe.startT;
+          // Direction = angle(pointerdown -> pointerup); Power = distance / elapsed time (clamped)
+          const shot = computeSwipeShot(swipe.startX, swipe.startY, sp.x, sp.y, elapsedMs);
+          releaseSwipePointer(e);
+          resetSwipeState();
+          canvas.style.cursor = 'default';
+
+          if (!shot.valid || !isHumanTurn()) {
+            if (shot.dist >= 8) showToast('Swipe up from your bowl towards the jack', 1600);
+            return;
+          }
+
+          state.aimDeg = shot.aimDeg;
+          state.power = shot.power;
+          state.headView = false;
+          headViewBtn.classList.remove('ring-4', 'ring-yellow-300/70');
+
+          // ---- MAIN GAME LOOP HOOK: deliver the bowl ----
+          // getEffectiveAimDeg adds the FH/BH draw offset, and launchBowl applies the hand's bias curl.
+          launchBowl(
+            state.turn,
+            state.deliveryPos.x,
+            state.deliveryPos.z,
+            getEffectiveAimDeg(shot.aimDeg, state.hand),
+            shot.power,
+            state.hand
+          );
+
+          // Neutral preview for the next delivery
+          state.aimDeg = 0.0;
+          state.power = 10.0;
+          return;
+        }
+
+        if (isPlacingBowl) {
+          isPlacingBowl = false;
+          releaseSwipePointer(e);
+          canvas.style.cursor = state.boxHover ? 'crosshair' : 'default';
+        }
+      });
+
+      canvas.addEventListener('pointercancel', (e) => {
+        if (swipe.active && e.pointerId === swipe.pointerId) {
+          releaseSwipePointer(e);
+          resetSwipeState();
+          state.aimDeg = 0.0;
+          state.power = 10.0;
+        }
+        if (isPlacingBowl) {
+          isPlacingBowl = false;
+          releaseSwipePointer(e);
+        }
+        canvas.style.cursor = 'default';
+      });
+
+      canvas.addEventListener('pointerleave', () => {
+        if (!isPlacingBowl && !swipe.active) {
+          state.boxHover = null;
+          canvas.style.cursor = 'default';
+        }
+      });
+
+
+      // Head View toggle (Yellow button with Blue eye)
+      headViewBtn.addEventListener('click', () => {
+        if (state.autoHeadView) {
+          state.autoHeadView = false;
+          state.headView = false;
+          headViewBtn.classList.remove('ring-4', 'ring-yellow-300/70');
+          showToast('Delivery View', 1300);
+          return;
+        }
+        state.headView = !state.headView;
+        if (state.headView) {
+          headViewBtn.classList.add('ring-4', 'ring-yellow-300/70');
+          showToast('Head View', 1300);
+        } else {
+          headViewBtn.classList.remove('ring-4', 'ring-yellow-300/70');
+          showToast('Delivery View', 1300);
+        }
+      });
+
+      // Forehand / Backhand toggle
+      btnFh.addEventListener('click', () => {
+        state.hand = 'FH';
+        updateTurnColorTheme();
+      });
+
+      btnBh.addEventListener('click', () => {
+        state.hand = 'BH';
+        updateTurnColorTheme();
+      });
+
+      // Lock Placement toggle (bottom-left unlocked/locked icon button)
+      function updateLockPlacementUI() {
+        const lockBtn = document.getElementById('lock-placement-btn');
+        const unlockedIcon = document.getElementById('lock-icon-unlocked');
+        const lockedIcon = document.getElementById('lock-icon-locked');
+        const lockLabel = document.getElementById('lock-placement-label');
+        if (!lockBtn || !unlockedIcon || !lockedIcon) return;
+
+        const locked = Boolean(state.placementLocked);
+        lockBtn.setAttribute('aria-pressed', locked ? 'true' : 'false');
+        lockBtn.setAttribute('aria-label', locked ? 'Unlock Placement' : 'Lock Placement');
+        unlockedIcon.classList.toggle('hidden', locked);
+        lockedIcon.classList.toggle('hidden', !locked);
+        if (lockLabel) {
+          lockLabel.textContent = locked ? 'UNLOCK PLACEMENT' : 'LOCK PLACEMENT';
+        }
+      }
+
+      const lockPlacementBtn = document.getElementById('lock-placement-btn');
+      const lockPlacementLabel = document.getElementById('lock-placement-label');
+      function toggleLockPlacement() {
+        state.placementLocked = !state.placementLocked;
+        if (state.placementLocked) {
+          isPlacingBowl = false;
+          state.boxHover = null;
+        }
+        updateLockPlacementUI();
+      }
+      if (lockPlacementBtn) lockPlacementBtn.addEventListener('click', toggleLockPlacement);
+      if (lockPlacementLabel) lockPlacementLabel.addEventListener('click', toggleLockPlacement);
+
+      // Between-Ends Summary Continue Button
+      document.getElementById('summary-continue-btn').addEventListener('click', () => {
+        summaryModal.classList.add('hidden');
+        summaryModal.classList.remove('flex');
+
+        if (state.end >= MAX_ENDS) {
+          state.end = 1;
+          state.p1Score = 0;
+          state.p2Score = 0;
+          state.p1DeadJackCount = 0;
+          state.p2DeadJackCount = 0;
+          state.matOwner = 'P1';
+          setupNewEnd('MEDIUM');
+          return;
+        }
+
+        state.end += 1;
+        updateHUD();
+
+        if (state.matOwner === 'P1' || state.gameMode === '2p') {
+          state.phase = 'JACK_SELECT';
+          document.getElementById('jack-modal-subtitle').textContent = `${getPlayerLabel(state.matOwner, 'scoreboard')} HOLDS THE MAT • END ${state.end}`;
+          jackSelectModal.classList.remove('hidden');
+          jackSelectModal.classList.add('flex');
+        } else {
+          // Strategic jack selection: shift jack length away from previous end to disrupt opponent weight calibration
+          const lead = state.p2Score - state.p1Score;
+          let aiChoice = 'SHORT';
+          if (lead > 0) {
+            aiChoice = state.jackLength === 'SHORT' ? 'LONG' : 'SHORT';
+          } else if (lead < 0) {
+            aiChoice = state.jackLength === 'LONG' ? 'SHORT' : 'LONG';
+          } else {
+            aiChoice = state.jackLength === 'MEDIUM' ? (Math.random() < 0.5 ? 'SHORT' : 'LONG') : 'MEDIUM';
+          }
+          setupNewEnd(aiChoice);
+        }
+      });
+
+      // Jack Length Choice Buttons (SHORT / MEDIUM / LONG)
+      document.querySelectorAll('.jack-choice-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const chosen = btn.getAttribute('data-jack');
+          jackSelectModal.classList.add('hidden');
+          jackSelectModal.classList.remove('flex');
+          setupNewEnd(chosen);
+        });
+      });
+
+      // =========================================================================
+      // 9B. PRE-GAME CLUBHOUSE MENU OVERLAY, MODE SWITCHING & AUDIO TOGGLES
+      // =========================================================================
+      const toggleMusicBtn = document.getElementById('toggle-music');
+      const toggleSfxBtn = document.getElementById('toggle-sfx');
+
+      function applySwitchVisual(btn, isOn) {
+        if (!btn) return;
+        btn.setAttribute('aria-checked', String(isOn));
+        const thumb = btn.querySelector('.switch-thumb');
+        if (isOn) {
+          btn.classList.add('is-on');
+          if (thumb) {
+            thumb.classList.remove('translate-x-0');
+            thumb.classList.add('translate-x-5');
+          }
+        } else {
+          btn.classList.remove('is-on');
+          if (thumb) {
+            thumb.classList.remove('translate-x-5');
+            thumb.classList.add('translate-x-0');
+          }
+        }
+      }
+
+      if (toggleMusicBtn) {
+        toggleMusicBtn.addEventListener('click', () => {
+          audioSettings.music = !audioSettings.music;
+          applySwitchVisual(toggleMusicBtn, audioSettings.music);
+          playMenuTapSfx();
+          syncBackgroundMusic(true);
+        });
+      }
+
+      if (toggleSfxBtn) {
+        toggleSfxBtn.addEventListener('click', () => {
+          audioSettings.sfx = !audioSettings.sfx;
+          applySwitchVisual(toggleSfxBtn, audioSettings.sfx);
+          playMenuTapSfx();
+        });
+      }
+
+      function setupIdleMenuPreview() {
+        state.phase = 'MENU';
+        state.headView = false;
+        state.autoHeadView = false;
+        state.bowls = [
+          { owner: 'P1', x: -0.28, z: JACK_DISTANCES.MEDIUM + 0.32, vx: 0, vz: 0, rolling: false, dead: false, spin: 0 },
+          { owner: 'P2', x: 0.36, z: JACK_DISTANCES.MEDIUM - 0.24, vx: 0, vz: 0, rolling: false, dead: false, spin: 0 }
+        ];
+        state.jack = {
+          x: 0.0,
+          z: JACK_DISTANCES.MEDIUM,
+          vx: 0,
+          vz: 0,
+          active: true,
+          inDitch: false,
+          ditchX: 0,
+          ditchZ: 0
+        };
+      }
+
+      function startGame(config = { mode: 'ai', opponent: 'Gary McNabb' }) {
+        playMenuTapSfx();
+        syncBackgroundMusic(true);
+
+        state.gameMode = config && config.mode === '2p' ? '2p' : 'ai';
+        state.opponentName = (config && config.opponent) || 'Gary McNabb';
+        state.end = 1;
+        state.p1Score = 0;
+        state.p2Score = 0;
+        state.p1DeadJackCount = 0;
+        state.p2DeadJackCount = 0;
+        state.matOwner = 'P1';
+        state.hand = 'FH';
+        state.aimDeg = 0.0;
+        state.power = 10.0;
+        state.placementLocked = false;
+        resetSwipeState();
+        updateLockPlacementUI();
+
+        summaryModal.classList.add('hidden');
+        summaryModal.classList.remove('flex');
+        jackSelectModal.classList.add('hidden');
+        jackSelectModal.classList.remove('flex');
+
+        if (menuOverlay) menuOverlay.classList.add('is-hidden');
+        document.body.classList.add('ambient-paused');
+        if (hudRoot) {
+          hudRoot.classList.remove('hidden');
+          requestAnimationFrame(() => hudRoot.classList.remove('opacity-0'));
+        }
+
+        setupNewEnd('MEDIUM');
+      }
+      window.startGame = startGame;
+
+      function returnToMenu() {
+        playMenuTapSfx();
+        summaryModal.classList.add('hidden');
+        summaryModal.classList.remove('flex');
+        jackSelectModal.classList.add('hidden');
+        jackSelectModal.classList.remove('flex');
+        headViewBtn.classList.remove('ring-4', 'ring-yellow-300/70');
+
+        if (toastTimer) clearTimeout(toastTimer);
+        toastBanner.classList.add('opacity-0', '-translate-y-2');
+        toastBanner.classList.remove('opacity-100', 'translate-y-0');
+
+        setupIdleMenuPreview();
+        updateHUD();
+
+        if (hudRoot) {
+          hudRoot.classList.add('opacity-0', 'hidden');
+        }
+        document.body.classList.remove('ambient-paused');
+        if (aiSelectorShell) aiSelectorShell.classList.add('hidden');
+        if (menuTopBanner) menuTopBanner.classList.remove('hidden');
+        if (menuMainCard) menuMainCard.classList.remove('hidden');
+        if (menuOverlay) menuOverlay.classList.remove('is-hidden');
+      }
+      window.returnToMenu = returnToMenu;
+
+      const menuTopBanner = document.getElementById('menu-top-banner');
+      const menuMainCard = document.getElementById('menu-main-card');
+      const aiSelectorShell = document.getElementById('ai-selector-shell');
+      const btn2pMode = document.getElementById('btn-2p-mode');
+      const btnVsAi = document.getElementById('btn-vs-ai');
+      const btnAiBack = document.getElementById('btn-ai-back');
+      const btnAiGary = document.getElementById('btn-ai-gary');
+      const hudMenuBtn = document.getElementById('hud-menu-btn');
+      const topHomeBtn = document.getElementById('top-home-btn');
+      const summaryMenuBtn = document.getElementById('summary-menu-btn');
+
+      if (btn2pMode) {
+        btn2pMode.addEventListener('click', () => startGame({ mode: '2p' }));
+      }
+      if (btnVsAi) {
+        btnVsAi.addEventListener('click', () => {
+          playMenuTapSfx();
+          if (menuTopBanner) menuTopBanner.classList.add('hidden');
+          if (menuMainCard) menuMainCard.classList.add('hidden');
+          if (aiSelectorShell) aiSelectorShell.classList.remove('hidden');
+        });
+      }
+      if (btnAiBack) {
+        btnAiBack.addEventListener('click', () => {
+          playMenuTapSfx();
+          if (aiSelectorShell) aiSelectorShell.classList.add('hidden');
+          if (menuTopBanner) menuTopBanner.classList.remove('hidden');
+          if (menuMainCard) menuMainCard.classList.remove('hidden');
+        });
+      }
+      if (btnAiGary) {
+        btnAiGary.addEventListener('click', () => startGame({ mode: 'ai', opponent: 'Gary McNabb' }));
+      }
+      if (hudMenuBtn) {
+        hudMenuBtn.addEventListener('click', () => returnToMenu());
+      }
+      if (topHomeBtn) {
+        topHomeBtn.addEventListener('click', () => returnToMenu());
+      }
+      if (summaryMenuBtn) {
+        summaryMenuBtn.addEventListener('click', () => returnToMenu());
+      }
+
+      // =========================================================================
+      // 10. ERROR-RESILIENT MAIN RENDER & SIMULATION LOOP
+      // =========================================================================
+      let lastTime = performance.now();
+
+      function loop(now) {
+        try {
+          const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
+          lastTime = now;
+
+          if (canvas.width === 0 || canvas.height === 0) {
+            resizeCanvas();
+          }
+
+          updateCamera(dt);
+          stepRollingPhysics(dt);
+          renderScene();
+        } catch (err) {
+          console.error('Render loop recovery:', err);
+        }
+        requestAnimationFrame(loop);
+      }
+
+      // Boot on Cozy Clubhouse Menu Overlay with live 3D rink showcase behind it
+      setupIdleMenuPreview();
+      updateHUD();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
